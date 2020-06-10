@@ -12,11 +12,13 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 paths=( **/*/Dockerfile )
 paths=( $( printf '%s\n' "${paths[@]%/Dockerfile}" | sort -t/ -k 1,1Vr -k 2,2 ) )
-url='https://github.com/appropriate/docker-jetty.git'
+url='https://github.com/eclipse/jetty.docker.git'
 
 cat <<-EOH
-	Maintainers: Mike Dillon <mike@appropriate.io> (@md5),
-	             Greg Wilkins <gregw@webtide.com> (@gregw)
+	Maintainers: Greg Wilkins <gregw@webtide.com> (@gregw),
+	             Lachlan Roberts <lachlan@webtide.com> (@lachlan-roberts)
+	             Olivier Lamy <olamy@webtide.com> (@olamy)
+	             Joakim Erdfelt <joakim@webtide.com> (@joakime)
 	GitRepo: $url
 EOH
 
