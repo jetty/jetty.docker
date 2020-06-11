@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Take two versions as strings (v1, v2), return 1 if v1 > v2 numerically, otherwise return 0.
-greaterThan9.4 ()
+greaterThanOrEqualTo9.4 ()
 {
 	# If version is not numerical it cannot be compared properly.
 	if [[ ! $1 =~ ^[0-9]+\.?[0-9]*$ ]]; then
@@ -80,7 +79,7 @@ for path in "${paths[@]}"; do
 		cp docker-entrypoint.sh generate-jetty-start.sh "$path"
 
 		# Only generate docker file for versions past 9.4, otherwise just update existing Dockerfile.
-		if greaterThan9.4 "${version}"; then
+		if greaterThanOrEqualTo9.4 "${version}"; then
 			# Generate the Dockerfile in the directory for this version.
 			echo "# DO NOT EDIT. Edit baseDockerfile${variant:+-$variant} and use update.sh" >"$path"/Dockerfile
 			cat "baseDockerfile${variant:+-$variant}" >>"$path"/Dockerfile
