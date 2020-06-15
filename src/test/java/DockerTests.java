@@ -52,18 +52,18 @@ public class DockerTests
             .collect(Collectors.toList());
         LOG.info("jetty.docker image tags: {}", imageTags);
 
-        // Use a docker image to run the Makefile to build all the jetty docker images.
-        GenericContainer buildContainer = new GenericContainer("docker:latest")
-            .withFileSystemBind("/var/run/docker.sock", "/var/run/docker.sock", BindMode.READ_WRITE)
-            .withFileSystemBind(USER_DIR, "/work", BindMode.READ_WRITE)
-            .withWorkingDirectory("/work")
-            .withCommand("sh", "-c", "ls -la && apk update && apk add make && make")
-            .withLogConsumer(new Slf4jLogConsumer(LOG))
-            .withStartupCheckStrategy(new OneShotStartupCheckStrategy().withTimeout(Duration.ofMinutes(10)));
-
-        // Because we use the OneShotStartupCheckStrategy, the call to start blocks until the container exits.
-        // This will throw if the container does not exit within the stop timeout or if returns exit code other than 0.
-        buildContainer.start();
+//        // Use a docker image to run the Makefile to build all the jetty docker images.
+//        GenericContainer buildContainer = new GenericContainer("docker:latest")
+//            .withFileSystemBind("/var/run/docker.sock", "/var/run/docker.sock", BindMode.READ_WRITE)
+//            .withFileSystemBind(USER_DIR, "/work", BindMode.READ_WRITE)
+//            .withWorkingDirectory("/work")
+//            .withCommand("sh", "-c", "ls -la && apk update && apk add make && make")
+//            .withLogConsumer(new Slf4jLogConsumer(LOG))
+//            .withStartupCheckStrategy(new OneShotStartupCheckStrategy().withTimeout(Duration.ofMinutes(10)));
+//
+//        // Because we use the OneShotStartupCheckStrategy, the call to start blocks until the container exits.
+//        // This will throw if the container does not exit within the stop timeout or if returns exit code other than 0.
+//        buildContainer.start();
 
         httpClient = new HttpClient();
         httpClient.start();
