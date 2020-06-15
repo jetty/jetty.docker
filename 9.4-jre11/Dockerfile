@@ -1,5 +1,5 @@
 # DO NOT EDIT. Edit Dockerfile-9.4 and use update.sh
-FROM openjdk:11-jre
+FROM openjdk:LABEL
 
 ENV JETTY_VERSION 9.4.27.v20200227
 ENV JETTY_HOME /usr/local/jetty
@@ -29,20 +29,20 @@ ENV JETTY_GPG_KEYS \
 
 RUN set -xe ; \
 	# fetch GPG keys
-        export GNUPGHOME=/jetty-keys ; \
+	export GNUPGHOME=/jetty-keys ; \
 	mkdir -p "$GNUPGHOME" ; \
-        for key in $JETTY_GPG_KEYS; do \
-                for server in \
-                        ha.pool.sks-keyservers.net \
-                        p80.pool.sks-keyservers.net:80 \
-                        ipv4.pool.sks-keyservers.net \
-                        pgp.mit.edu ; \
-                do \
-                        if gpg --batch --keyserver "$server" --recv-keys "$key"; then \
-                                break; \
-                        fi; \
-                done; \
-        done ; \
+	for key in $JETTY_GPG_KEYS; do \
+		for server in \
+			ha.pool.sks-keyservers.net \
+			p80.pool.sks-keyservers.net:80 \
+			ipv4.pool.sks-keyservers.net \
+			pgp.mit.edu ; \
+		do \
+			if gpg --batch --keyserver "$server" --recv-keys "$key"; then \
+				break; \
+			fi; \
+		done; \
+	done ; \
 	#
 	# Fetch jetty release into JETTY_HOME
 	mkdir -p "$JETTY_HOME" ; \
