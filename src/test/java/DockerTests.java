@@ -32,7 +32,7 @@ public class DockerTests
 {
     private static final Logger LOG = LoggerFactory.getLogger(DockerTests.class);
     private static final Pattern PATTERN = Pattern.compile("^[0-9]+\\.[0-9]*-.*");
-    private static final String USER_DIR = System.getProperty("user.dir");
+    private static final String USER_DIR = System.getProperty("basedir");
     private static List<String> imageTags;
     private static HttpClient httpClient;
     public static Stream<Arguments> getImageTags()
@@ -46,7 +46,7 @@ public class DockerTests
         LOG.info("Running tests with user directory: {}", USER_DIR);
 
         // Assemble a list of all the jetty image tags we need to test.
-        imageTags = Files.list(Paths.get(System.getProperty("user.dir")))
+        imageTags = Files.list(Paths.get(USER_DIR))
             .map(path -> path.getFileName().toString())
             .filter(fileName -> PATTERN.matcher(fileName).matches())
             .collect(Collectors.toList());
