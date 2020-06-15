@@ -11,7 +11,6 @@ import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -25,6 +24,7 @@ import org.testcontainers.containers.startupcheck.OneShotStartupCheckStrategy;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 @Testcontainers
@@ -73,30 +73,30 @@ public class DockerTests
             httpClient.stop();
     }
 
-    private GenericContainer container;
-
     @ParameterizedTest
     @MethodSource("getImageTags")
     public void testJettyDockerImage(String imageTag) throws Exception
     {
-        // Start a jetty docker image with this imageTag.
-        container = new GenericContainer("jetty:" + imageTag).withExposedPorts(8080);
-        container.start();
-
-        // We should be able to get a 404 response from the running jetty server.
-        ContentResponse response = httpClient.newRequest("http://localhost:" + container.getFirstMappedPort())
-            .method(HttpMethod.GET)
-            .send();
-        assertThat(response.getStatus(), is(HttpStatus.NOT_FOUND_404));
-    }
-
-    @AfterEach
-    public void afterEach()
-    {
-        if (container != null)
+        // Start a jetty docker image with this imageTag, binding the directory of a simple webapp.
+        String testWebappDir = System.getProperty("user.dir") + "/src/test/resources/test-webapp";
+        String bindDir = "/var/lib/jetty/webapps/test-webapp";
+        try(GenericContainer container = new GenericContainer("jetty:" + imageTag)
+            .withExposedPorts(8080)
+            .withFileSystemBind(testWebappDir, bindDir, BindMode.READ_WRITE))
         {
-            container.stop();
-            container = null;
+            // Start the docker container and the server.
+            container.start();
+
+            // We should be able to get a 200 response from the test-webapp on the running jetty server.
+            ContentResponse response = httpClient.newRequest("http://" + container.getHost() + ":" + container.getFirstMappedPort() + "/test-webapp")
+                .method(HttpMethod.GET)
+                .send();
+
+            // We get the correct index.html for the test webapp.
+            assertThat(response.getStatus(), is(HttpStatus.OK_200));
+            String content = response.getContentAsString();
+            assertThat(content, containsString("test-webapp"));
+            assertThat(content, containsString("success"));
         }
     }
 }
