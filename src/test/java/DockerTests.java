@@ -91,7 +91,7 @@ public class DockerTests
             container.start();
 
             // We should be able to get a 200 response from the test-webapp on the running jetty server.
-            ContentResponse response = httpClient.newRequest("http://" + container.getHost() + ":" + container.getFirstMappedPort() + "/test-webapp")
+            ContentResponse response = httpClient.newRequest("http://" + container.getHost() + ":" + container.getMappedPort(8080) + "/test-webapp")
                 .method(HttpMethod.GET)
                 .send();
 
