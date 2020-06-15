@@ -14,14 +14,14 @@ pipeline {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            //container('jetty-build') {
+            container('jetty-build') {
               mavenBuild( "jdk11", "clean verify" )
               script {
                 if ( env.BRANCH_NAME == 'master' )
                 {
                 }
               }
-            //}
+            }
           }
         }
       }
