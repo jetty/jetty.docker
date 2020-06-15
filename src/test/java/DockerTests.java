@@ -57,7 +57,7 @@ public class DockerTests
             .withFileSystemBind("/var/run/docker.sock", "/var/run/docker.sock", BindMode.READ_WRITE)
             .withFileSystemBind(USER_DIR, "/work", BindMode.READ_WRITE)
             .withWorkingDirectory("/work")
-            .withCommand("sh", "-c", "apk update && apk add make && make")
+            .withCommand("sh", "-c", "ls -la && apk update && apk add make && make")
             .withLogConsumer(new Slf4jLogConsumer(LOG))
             .withStartupCheckStrategy(new OneShotStartupCheckStrategy().withTimeout(Duration.ofMinutes(10)));
 
