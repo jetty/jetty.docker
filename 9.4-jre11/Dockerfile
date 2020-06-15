@@ -1,5 +1,5 @@
 # DO NOT EDIT. Edit Dockerfile-9.4 and use update.sh
-FROM openjdk:LABEL
+FROM openjdk:11-jre
 
 ENV JETTY_VERSION 9.4.27.v20200227
 ENV JETTY_HOME /usr/local/jetty
