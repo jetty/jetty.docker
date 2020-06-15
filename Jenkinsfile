@@ -8,19 +8,15 @@ pipeline {
     timeout(time: 60, unit: 'MINUTES')
   }
   stages {
-    stage( "Parallel Stage" ) {
-      parallel {
-        stage( "Build / Test - JDK11" ) {
-          agent { node { label 'linux' } }
-          options { timeout( time: 120, unit: 'MINUTES' ) }
-          steps {
-            container('jetty-build') {
-              mavenBuild( "jdk11", "clean verify" )
-              script {
-                if ( env.BRANCH_NAME == 'master' )
-                {
-                }
-              }
+    stage( "Build / Test - JDK11" ) {
+      agent { node { label 'linux' } }
+      options { timeout( time: 120, unit: 'MINUTES' ) }
+      steps {
+        container('jetty-build') {
+          mavenBuild( "jdk11", "clean verify" )
+          script {
+            if ( env.BRANCH_NAME == 'master' )
+            {
             }
           }
         }
