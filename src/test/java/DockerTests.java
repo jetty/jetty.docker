@@ -32,9 +32,9 @@ public class DockerTests
 {
     private static final Logger LOG = LoggerFactory.getLogger(DockerTests.class);
     private static final Pattern PATTERN = Pattern.compile("^[0-9]+\\.[0-9]*-.*");
+    private static final String USER_DIR = System.getProperty("user.dir");
     private static List<String> imageTags;
     private static HttpClient httpClient;
-
     public static Stream<Arguments> getImageTags()
     {
         return imageTags.stream().map(Arguments::of);
@@ -43,16 +43,19 @@ public class DockerTests
     @BeforeAll
     public static void beforeAll() throws Exception
     {
+        LOG.info("Running tests with user directory: {}", USER_DIR);
+
         // Assemble a list of all the jetty image tags we need to test.
         imageTags = Files.list(Paths.get(System.getProperty("user.dir")))
             .map(path -> path.getFileName().toString())
             .filter(fileName -> PATTERN.matcher(fileName).matches())
             .collect(Collectors.toList());
+        LOG.info("jetty.docker image tags: {}", imageTags);
 
         // Use a docker image to run the Makefile to build all the jetty docker images.
         GenericContainer buildContainer = new GenericContainer("docker:latest")
             .withFileSystemBind("/var/run/docker.sock", "/var/run/docker.sock", BindMode.READ_WRITE)
-            .withFileSystemBind(System.getProperty("user.dir"), "/work", BindMode.READ_WRITE)
+            .withFileSystemBind(USER_DIR, "/work", BindMode.READ_WRITE)
             .withWorkingDirectory("/work")
             .withCommand("sh", "-c", "apk update && apk add make && make")
             .withLogConsumer(new Slf4jLogConsumer(LOG))
@@ -78,7 +81,7 @@ public class DockerTests
     public void testJettyDockerImage(String imageTag) throws Exception
     {
         // Start a jetty docker image with this imageTag, binding the directory of a simple webapp.
-        String testWebappDir = System.getProperty("user.dir") + "/src/test/resources/test-webapp";
+        String testWebappDir = USER_DIR + "/src/test/resources/test-webapp";
         String bindDir = "/var/lib/jetty/webapps/test-webapp";
         try(GenericContainer container = new GenericContainer("jetty:" + imageTag)
             .withExposedPorts(8080)
