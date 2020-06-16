@@ -29,7 +29,7 @@ public class DockerTests
 {
     private static final Logger LOG = LoggerFactory.getLogger(DockerTests.class);
     private static final Pattern PATTERN = Pattern.compile("^[0-9]+\\.[0-9]*-.*");
-    private static final String USER_DIR = (System.getProperty("basedir") != null) ? System.getProperty("basedir") : System.getProperty("user.dir");
+    private static final String USER_DIR = System.getProperty("user.dir");
     private static List<String> imageTags;
     private static HttpClient httpClient;
 
