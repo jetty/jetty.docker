@@ -1,4 +1,4 @@
-# DO NOT EDIT. Edit Dockerfile-9.4 and use update.sh
+# DO NOT EDIT. Edit baseDockerfile and use update.sh
 FROM openjdk:13-jdk
 
 ENV JETTY_VERSION 9.4.27.v20200227
@@ -25,24 +25,26 @@ ENV JETTY_GPG_KEYS \
 	# Greg Wilkins    <gregw@webtide.com>
 	FBA2B18D238AB852DF95745C76157BDF03D0DCD6 \
 	# Greg Wilkins    <gregw@webtide.com>
-	5C9579B3DB2E506429319AAEF33B071B29559E1E
+	5C9579B3DB2E506429319AAEF33B071B29559E1E \
+	# Olivier Lamy <olamy@apache.org>
+	F254B35617DC255D9344BCFA873A8E86B4372146
 
 RUN set -xe ; \
 	# fetch GPG keys
-        export GNUPGHOME=/jetty-keys ; \
+	export GNUPGHOME=/jetty-keys ; \
 	mkdir -p "$GNUPGHOME" ; \
-        for key in $JETTY_GPG_KEYS; do \
-                for server in \
-                        ha.pool.sks-keyservers.net \
-                        p80.pool.sks-keyservers.net:80 \
-                        ipv4.pool.sks-keyservers.net \
-                        pgp.mit.edu ; \
-                do \
-                        if gpg --batch --keyserver "$server" --recv-keys "$key"; then \
-                                break; \
-                        fi; \
-                done; \
-        done ; \
+	for key in $JETTY_GPG_KEYS; do \
+		for server in \
+			ha.pool.sks-keyservers.net \
+			p80.pool.sks-keyservers.net:80 \
+			ipv4.pool.sks-keyservers.net \
+			pgp.mit.edu ; \
+		do \
+			if gpg --batch --keyserver "$server" --recv-keys "$key"; then \
+				break; \
+			fi; \
+		done; \
+	done ; \
 	#
 	# Fetch jetty release into JETTY_HOME
 	mkdir -p "$JETTY_HOME" ; \

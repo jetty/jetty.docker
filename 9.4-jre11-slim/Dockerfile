@@ -1,4 +1,4 @@
-# DO NOT EDIT. Edit Dockerfile-9.4 and use update.sh
+# DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
 FROM openjdk:11-jre-slim
 
 ENV JETTY_VERSION 9.4.27.v20200227
@@ -25,35 +25,40 @@ ENV JETTY_GPG_KEYS \
 	# Greg Wilkins    <gregw@webtide.com>
 	FBA2B18D238AB852DF95745C76157BDF03D0DCD6 \
 	# Greg Wilkins    <gregw@webtide.com>
-	5C9579B3DB2E506429319AAEF33B071B29559E1E
+	5C9579B3DB2E506429319AAEF33B071B29559E1E \
+	# Olivier Lamy <olamy@apache.org>
+	F254B35617DC255D9344BCFA873A8E86B4372146
 
 RUN set -xe ; \
-        # Save initial installatin state
+	# Save initial installation state
 	export savedAptMark="$(apt-mark showmanual)" ; \
 	#
-        # Install utils needed to verify keys
+	mkdir -p $TMPDIR ; \
+	#
+	# Install utils needed to verify keys
 	apt-get update ; \
 	apt-get install -y --no-install-recommends \
-		ca-certificates p11-kit \
+		ca-certificates \
+		p11-kit \
 		gnupg \
 		curl \
 		; \
 	#
 	# fetch GPG keys
-        export GNUPGHOME=/jetty-keys ; \
+	export GNUPGHOME=/jetty-keys ; \
 	mkdir -p "$GNUPGHOME" ; \
-        for key in $JETTY_GPG_KEYS; do \
-                for server in \
-                        ha.pool.sks-keyservers.net \
-                        p80.pool.sks-keyservers.net:80 \
-                        ipv4.pool.sks-keyservers.net \
-                        pgp.mit.edu ; \
-                do \
-                        if gpg --batch --keyserver "$server" --recv-keys "$key"; then \
-                                break; \
-                        fi; \
-                done; \
-        done ; \
+	for key in $JETTY_GPG_KEYS; do \
+		for server in \
+			ha.pool.sks-keyservers.net \
+			p80.pool.sks-keyservers.net:80 \
+			ipv4.pool.sks-keyservers.net \
+			pgp.mit.edu ; \
+		do \
+			if gpg --batch --keyserver "$server" --recv-keys "$key"; then \
+				break; \
+			fi; \
+		done; \
+	done ; \
 	#
 	# Fetch jetty release into JETTY_HOME
 	mkdir -p "$JETTY_HOME" ; \
@@ -73,7 +78,6 @@ RUN set -xe ; \
 	cd $JETTY_BASE ; \
 	java -jar "$JETTY_HOME/start.jar" --create-startd \
 		--add-to-start="server,http,deploy,jsp,jstl,ext,resources,websocket" ; \
-	mkdir -p "$TMPDIR" ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
 	#
