@@ -1,6 +1,5 @@
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -30,9 +29,10 @@ public class DockerTests
 {
     private static final Logger LOG = LoggerFactory.getLogger(DockerTests.class);
     private static final Pattern PATTERN = Pattern.compile("^[0-9]+\\.[0-9]*-.*");
-    private static final String USER_DIR = System.getProperty("basedir");
+    private static final String USER_DIR = (System.getProperty("basedir") != null) ? System.getProperty("basedir") : System.getProperty("user.dir");
     private static List<String> imageTags;
     private static HttpClient httpClient;
+
     public static Stream<Arguments> getImageTags()
     {
         return imageTags.stream().map(Arguments::of);
@@ -66,19 +66,17 @@ public class DockerTests
     public void testJettyDockerImage(String imageTag) throws Exception
     {
         // Start a jetty docker image with this imageTag, binding the directory of a simple webapp.
-        String testWebappDir = USER_DIR + "/src/test/resources/test-webapp";
         String bindDir = "/var/lib/jetty/webapps/test-webapp";
-        try(GenericContainer container = new GenericContainer("jetty:" + imageTag)
+        try (GenericContainer container = new GenericContainer("jetty:" + imageTag)
             .withExposedPorts(8080)
-            .withClasspathResourceMapping( "test-webapp", bindDir, BindMode.READ_ONLY ))
+            .withClasspathResourceMapping("test-webapp", bindDir, BindMode.READ_ONLY))
         {
             // Start the docker container and the server.
             container.start();
 
             // We should be able to get a 200 response from the test-webapp on the running jetty server.
-            ContentResponse response = httpClient.newRequest("http://" + container.getHost() + ":"
-                                                                 + container.getMappedPort(8080)
-                                                                 + "/test-webapp/index.html")
+            String uri = "http://" + container.getHost() + ":" + container.getMappedPort(8080) + "/test-webapp/index.html";
+            ContentResponse response = httpClient.newRequest(uri)
                 .method(HttpMethod.GET)
                 .send();
 
