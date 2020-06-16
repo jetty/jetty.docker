@@ -1,4 +1,4 @@
-# DO NOT EDIT. Edit Dockerfile-9.4 and use update.sh
+# DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
 FROM openjdk:13-jdk-slim
 
 ENV JETTY_VERSION 9.4.27.v20200227
@@ -25,7 +25,9 @@ ENV JETTY_GPG_KEYS \
 	# Greg Wilkins    <gregw@webtide.com>
 	FBA2B18D238AB852DF95745C76157BDF03D0DCD6 \
 	# Greg Wilkins    <gregw@webtide.com>
-	5C9579B3DB2E506429319AAEF33B071B29559E1E
+	5C9579B3DB2E506429319AAEF33B071B29559E1E \
+	# Olivier Lamy <olamy@apache.org>
+	F254B35617DC255D9344BCFA873A8E86B4372146
 
 RUN set -xe ; \
 	# Save initial installation state
