@@ -1,6 +1,6 @@
 FROM openjdk:8-jre
 
-ENV JETTY_VERSION 9.2.29.v20191105
+ENV JETTY_VERSION 9.2.30.v20200428
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty

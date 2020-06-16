@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
-FROM openjdk:13-jdk-slim
+FROM openjdk:11-jdk-slim
 
-ENV JETTY_VERSION 9.4.27.v20200227
+ENV JETTY_VERSION 11.0.0-alpha0
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
