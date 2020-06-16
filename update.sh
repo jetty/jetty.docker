@@ -1,15 +1,29 @@
 #!/bin/bash
 
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+greaterThanOrEqualTo9.4 ()
+{
+	# If version is not numerical it cannot be compared properly.
+	if [[ ! $1 =~ ^[0-9]+\.?[0-9]*$ ]]; then
+		echo "Invalid version $1"
+		exit 1
+	fi
+
+	# Compare version numerically using awk.
+	if awk 'BEGIN{exit ARGV[1]>=ARGV[2]}' "$1" "9.4"; then
+		return 1
+	else
+		return 0
+	fi
+}
 
 paths=( "$@" )
 if [ ${#paths[@]} -eq 0 ]; then
 	paths=( */ )
 fi
 paths=( "${paths[@]%/}" )
+paths=($(echo "${paths[@]}" | sed 's/ /\n/g' | grep -v '^[^0-9]'))
 
 MAVEN_METADATA_URL='https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/maven-metadata.xml'
-
 available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
 
 for path in "${paths[@]}"; do
@@ -22,6 +36,8 @@ for path in "${paths[@]}"; do
 
 	milestones=()
 	releaseCandidates=()
+	alphaReleases=()
+	betaReleases=()
 	fullReleases=()
 	for candidate in "${available[@]}"; do
 		if [[ "$candidate" == "$version".* ]]; then
@@ -31,6 +47,10 @@ for path in "${paths[@]}"; do
 				releaseCandidates+=("$candidate")
 			elif [[ "$candidate" == *.v* ]]; then
 				fullReleases+=("$candidate")
+			elif [[ "$candidate" == *alpha* ]]; then
+				alphaReleases+=("$candidate")
+			elif [[ "$candidate" == *beta* ]]; then
+				betaReleases+=("$candidate")
 			fi
 		fi
 	done
@@ -42,6 +62,10 @@ for path in "${paths[@]}"; do
 		fullVersion="$releaseCandidates"
 	elif [ -n "${milestones-}" ]; then
 		fullVersion="$milestones"
+	elif [ -n "${betaReleases-}" ]; then
+		fullVersion="$betaReleases"
+	elif [ -n "${alphaReleases-}" ]; then
+		fullVersion="$alphaReleases"
 	fi
 
 	if [ -z "$fullVersion" ]; then
@@ -49,14 +73,19 @@ for path in "${paths[@]}"; do
 		exit 1
 	fi
 
-	echo Full Version ${fullVersion}
+	echo Full Version "${fullVersion}"
 
 	if [ -d "$path" ]; then
 		cp docker-entrypoint.sh generate-jetty-start.sh "$path"
-		if [ "$version" == "9.4" ] ; then
-			sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "Dockerfile-9.4${variant:+-$variant}"
-			echo '# DO NOT EDIT. Edit Dockerfile-9.4 and use update.sh' > "$path"/Dockerfile
-			cat Dockerfile-9.4${variant:+-$variant} >> "$path"/Dockerfile
+
+		# Only generate docker file for versions past 9.4, otherwise just update existing Dockerfile.
+		if greaterThanOrEqualTo9.4 "${version}"; then
+			# Generate the Dockerfile in the directory for this version.
+			echo "# DO NOT EDIT. Edit baseDockerfile${variant:+-$variant} and use update.sh" >"$path"/Dockerfile
+			cat "baseDockerfile${variant:+-$variant}" >>"$path"/Dockerfile
+
+			# Set the Jetty and JDK/JRE versions in the generated Dockerfile.
+			sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "$path/Dockerfile"
 			sed -ri 's/^(FROM openjdk:)LABEL/\1'"$label"'/; ' "$path/Dockerfile"
 		else
 			sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "$path/Dockerfile"

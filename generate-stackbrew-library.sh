@@ -81,11 +81,11 @@ for path in "${paths[@]}"; do
 		done
 	fi
 
-	cat <<-EOE
-
-		Tags:$(IFS=, ; echo "${tags[*]/#/ }")
-		Architectures: $(< "$directory/arches")
-		Directory: $directory
-		GitCommit: $commit
-	EOE
+	echo
+	echo "Tags:$(IFS=, ; echo "${tags[*]/#/ }")"
+	if [ -f "$directory/arches" ]; then
+		echo "Architectures: $(< "$directory/arches")"
+	fi
+	echo "Directory: $directory"
+	echo "GitCommit: $commit"
 done
