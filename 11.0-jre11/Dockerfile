@@ -1,7 +1,7 @@
-# DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
-FROM openjdk:11-jre-slim
+# DO NOT EDIT. Edit baseDockerfile and use update.sh
+FROM openjdk:11-jre
 
-ENV JETTY_VERSION 9.4.30.v20200611
+ENV JETTY_VERSION 11.0.0-alpha0
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
@@ -30,20 +30,6 @@ ENV JETTY_GPG_KEYS \
 	F254B35617DC255D9344BCFA873A8E86B4372146
 
 RUN set -xe ; \
-	# Save initial installation state
-	export savedAptMark="$(apt-mark showmanual)" ; \
-	#
-	mkdir -p $TMPDIR ; \
-	#
-	# Install utils needed to verify keys
-	apt-get update ; \
-	apt-get install -y --no-install-recommends \
-		ca-certificates \
-		p11-kit \
-		gnupg \
-		curl \
-		; \
-	#
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
 	mkdir -p "$GNUPGHOME" ; \
@@ -78,14 +64,9 @@ RUN set -xe ; \
 	cd $JETTY_BASE ; \
 	java -jar "$JETTY_HOME/start.jar" --create-startd \
 		--add-to-start="server,http,deploy,jsp,jstl,ext,resources,websocket" ; \
+	mkdir -p "$TMPDIR" ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
-	#
-	# Cleanup any apt
-	apt-mark auto '.*' > /dev/null ; \
-	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null ; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false ; \
-	rm -rf /var/lib/apt/lists/* ; \
 	#
 	# Cleanup
 	rm -rf /tmp/hsperfdata_root ; \
