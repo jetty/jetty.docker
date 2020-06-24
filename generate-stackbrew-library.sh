@@ -16,8 +16,8 @@ url='https://github.com/eclipse/jetty.docker.git'
 
 cat <<-EOH
 	Maintainers: Greg Wilkins <gregw@webtide.com> (@gregw),
-	             Lachlan Roberts <lachlan@webtide.com> (@lachlan-roberts)
-	             Olivier Lamy <olamy@webtide.com> (@olamy)
+	             Lachlan Roberts <lachlan@webtide.com> (@lachlan-roberts),
+	             Olivier Lamy <olamy@webtide.com> (@olamy),
 	             Joakim Erdfelt <joakim@webtide.com> (@joakime)
 	GitRepo: $url
 EOH
