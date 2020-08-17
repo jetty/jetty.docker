@@ -16,12 +16,19 @@ greaterThanOrEqualTo9.4 ()
 	fi
 }
 
+# Update the Travis CI Build Directories
+if ! command -v ./generateTravis.sh >/dev/null 2>&1 ; then
+    echo "WARNING: Run update script from the jetty.docker project directory to update the Travis CI file."
+else
+    ./generateTravis.sh > .travis.yml
+fi
+
+# Update the docker files and scripts for every directory in paths.
 paths=( "$@" )
 if [ ${#paths[@]} -eq 0 ]; then
-	paths=( */ )
+	paths=( $(ls | egrep '^[0-9]' | sort -nr) )
 fi
 paths=( "${paths[@]%/}" )
-paths=($(echo "${paths[@]}" | grep '^[0-9]'))
 
 MAVEN_METADATA_URL='https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/maven-metadata.xml'
 available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
