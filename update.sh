@@ -21,7 +21,7 @@ if [ ${#paths[@]} -eq 0 ]; then
 	paths=( */ )
 fi
 paths=( "${paths[@]%/}" )
-paths=($(echo "${paths[@]}" | sed 's/ /\n/g' | grep -v '^[^0-9]'))
+paths=($(echo "${paths[@]}" | grep '^[0-9]'))
 
 MAVEN_METADATA_URL='https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/maven-metadata.xml'
 available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
