@@ -92,9 +92,10 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 		# Do a jetty dry run to set the final command
 		JAVA="$1"
 		shift
-		$JAVA $JAVA_OPTIONS "$@" --dry-run > $JETTY_START
+		$JAVA "$@" --dry-run > $JETTY_START
 		if [ $(egrep -v '\\$' $JETTY_START | wc -l ) -gt 1 ] ; then
 			# command was more than a dry-run
+		    echo "jetty.start contained unexpected lines:"
 			cat $JETTY_START \
 			| awk '/\\$/ { printf "%s", substr($0, 1, length($0)-1); next } 1' \
 			| egrep -v '[^ ]*java .* org\.eclipse\.jetty\.xml\.XmlConfiguration '
