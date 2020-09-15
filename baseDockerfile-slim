@@ -79,6 +79,7 @@ RUN set -xe ; \
 		--add-to-start="server,http,deploy,jsp,jstl,ext,resources,websocket" ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
+	usermod -d $JETTY_BASE jetty ; \
 	#
 	# Cleanup any apt
 	apt-mark auto '.*' > /dev/null ; \

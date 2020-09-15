@@ -66,6 +66,7 @@ RUN set -xe ; \
 	mkdir -p "$TMPDIR" ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
+	usermod -d $JETTY_BASE jetty ; \
 	#
 	# Cleanup
 	rm -rf /tmp/hsperfdata_root ; \
