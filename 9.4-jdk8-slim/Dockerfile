@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
 FROM openjdk:8-jdk-slim
 
-ENV JETTY_VERSION 9.4.31.v20200723
+ENV JETTY_VERSION 9.4.32.v20200930
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
@@ -80,6 +80,7 @@ RUN set -xe ; \
 		--add-to-start="server,http,deploy,jsp,jstl,ext,resources,websocket" ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
+	usermod -d $JETTY_BASE jetty ; \
 	#
 	# Cleanup any apt
 	apt-mark auto '.*' > /dev/null ; \

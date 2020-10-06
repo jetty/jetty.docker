@@ -89,18 +89,23 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 		echo $(date +'%Y-%m-%d %H:%M:%S.000'):INFO:docker-entrypoint:jetty start from $JETTY_START
 		set -- $(cat $JETTY_START)
 	else
-		# Do a jetty dry run to set the final command
+		# Do a jetty dry run to set the final command.
 		JAVA="$1"
 		shift
-		$JAVA $JAVA_OPTIONS "$@" --dry-run > $JETTY_START
-		if [ $(egrep -v '\\$' $JETTY_START | wc -l ) -gt 1 ] ; then
-			# command was more than a dry-run
-			cat $JETTY_START \
-			| awk '/\\$/ { printf "%s", substr($0, 1, length($0)-1); next } 1' \
-			| egrep -v '[^ ]*java .* org\.eclipse\.jetty\.xml\.XmlConfiguration '
+		DRY_RUN=$($JAVA $JAVA_OPTIONS "$@" --dry-run)
+		echo "$DRY_RUN" \
+		    | egrep '[^ ]*java .* org\.eclipse\.jetty\.xml\.XmlConfiguration ' \
+		    | sed -e 's/ -Djava.io.tmpdir=[^ ]*//g' -e 's/\\$//' \
+		    > $JETTY_START
+
+		# If jetty.start doesn't have content then the dry-run failed.
+		if ! [ -s $JETTY_START ]; then
+		    echo "jetty dry run failed:"
+			echo "$DRY_RUN" | awk '/\\$/ { printf "%s", substr($0, 1, length($0)-1); next } 1'
 			exit
 		fi
-		set -- $(sed -e 's/ -Djava.io.tmpdir=[^ ]*//g' -e 's/\\$//' $JETTY_START)
+
+		set -- $(cat $JETTY_START)
 	fi
 fi
 

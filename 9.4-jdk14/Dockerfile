@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile and use update.sh
 FROM openjdk:14-jdk
 
-ENV JETTY_VERSION 9.4.31.v20200723
+ENV JETTY_VERSION 9.4.32.v20200930
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
@@ -67,6 +67,7 @@ RUN set -xe ; \
 	mkdir -p "$TMPDIR" ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
+	usermod -d $JETTY_BASE jetty ; \
 	#
 	# Cleanup
 	rm -rf /tmp/hsperfdata_root ; \
