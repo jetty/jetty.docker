@@ -101,7 +101,7 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 		# If jetty.start doesn't have content then the dry-run failed.
 		if ! [ -s $JETTY_START ]; then
 		    echo "jetty dry run failed:"
-			echo DRY_RUN | awk '/\\$/ { printf "%s", substr($0, 1, length($0)-1); next } 1'
+			echo "$DRY_RUN" | awk '/\\$/ { printf "%s", substr($0, 1, length($0)-1); next } 1'
 			exit
 		fi
 
