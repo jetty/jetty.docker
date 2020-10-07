@@ -83,7 +83,10 @@ for path in "${paths[@]}"; do
 	echo Full Version "${fullVersion}"
 
 	if [ -d "$path" ]; then
-		cp docker-entrypoint.sh generate-jetty-start.sh "$path"
+        # Exclude 9.2 from updated script files.
+	    if [[ "$version" != "9.2" ]]; then
+		    cp docker-entrypoint.sh generate-jetty-start.sh "$path"
+        fi
 
 		# Only generate docker file for versions past 9.4, otherwise just update existing Dockerfile.
 		if greaterThanOrEqualTo9.4 "${version}"; then
