@@ -18,9 +18,9 @@ greaterThanOrEqualTo9.4 ()
 
 # Update the Travis CI Build Directories
 if ! command -v ./generateTravis.sh >/dev/null 2>&1 ; then
-    echo "WARNING: Run update script from the jetty.docker project directory to update the Travis CI file."
+	echo "WARNING: Run update script from the jetty.docker project directory to update the Travis CI file."
 else
-    ./generateTravis.sh > .travis.yml
+	./generateTravis.sh > .travis.yml
 fi
 
 # Update the docker files and scripts for every directory in paths.
@@ -83,10 +83,10 @@ for path in "${paths[@]}"; do
 	echo Full Version "${fullVersion}"
 
 	if [ -d "$path" ]; then
-        # Exclude 9.2 from updated script files.
-	    if [[ "$version" != "9.2" ]]; then
-		    cp docker-entrypoint.sh generate-jetty-start.sh "$path"
-        fi
+		# Exclude 9.2 from updated script files.
+		if [[ "$version" != "9.2" ]]; then
+			cp docker-entrypoint.sh generate-jetty-start.sh "$path"
+		fi
 
 		# Only generate docker file for versions past 9.4, otherwise just update existing Dockerfile.
 		if greaterThanOrEqualTo9.4 "${version}"; then

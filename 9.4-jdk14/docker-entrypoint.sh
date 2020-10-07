@@ -94,9 +94,9 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 		shift
 		DRY_RUN=$($JAVA $JAVA_OPTIONS "$@" --dry-run)
 		echo "$DRY_RUN" \
-		    | egrep '[^ ]*java .* org\.eclipse\.jetty\.xml\.XmlConfiguration ' \
-		    | sed -e 's/ -Djava.io.tmpdir=[^ ]*//g' -e 's/\\$//' \
-		    > $JETTY_START
+			| egrep '[^ ]*java .* org\.eclipse\.jetty\.xml\.XmlConfiguration ' \
+			| sed -e 's/ -Djava.io.tmpdir=[^ ]*//g' -e 's/\\$//' \
+			> $JETTY_START
 
 		# If jetty.start doesn't have content then the dry-run failed.
 		if ! [ -s $JETTY_START ]; then
