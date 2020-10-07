@@ -11,7 +11,7 @@ defaultJdk="jdk14"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 paths=( **/*/Dockerfile )
-paths=( $( printf '%s\n' "${paths[@]%/Dockerfile}" | sort -t/ -k 1,1Vr -k 2,2 ) )
+paths=( $( printf '%s\n' "${paths[@]%/Dockerfile}" | egrep '^[0-9]' | sort -t/ -k 1,1Vr -k 2,2 ) )
 url='https://github.com/eclipse/jetty.docker.git'
 
 cat <<-EOH
