@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile and use update.sh
 FROM openjdk:14-jdk
 
-ENV JETTY_VERSION 10.0.0.beta2
+ENV JETTY_VERSION 10.0.0.beta3
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
