@@ -4,9 +4,16 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+<<<<<<< HEAD
       open-pull-requests-limit: 20
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "daily"
       open-pull-requests-limit: 20
+=======
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+>>>>>>> 89aef9a... add ghactions
