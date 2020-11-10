@@ -49,7 +49,7 @@ def mavenBuild(jdk, cmdline) {
           mavenOpts: mavenOpts,
           mavenLocalRepo: localRepo) {
     // Some common Maven command line + provided command line
-    sh "mvn -V -B -DfailIfNoTests=false -fae $cmdline"
+    sh "mvn -V -B -e -DfailIfNoTests=false -fae $cmdline"
   }
 }
 
