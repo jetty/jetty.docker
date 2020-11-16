@@ -6,14 +6,14 @@ dist: trusty
 env:
   - VERSION=11.0-jre11-slim
   - VERSION=11.0-jre11
-  - VERSION=11.0-jdk14-slim
-  - VERSION=11.0-jdk14
+  - VERSION=11.0-jdk15-slim
+  - VERSION=11.0-jdk15
   - VERSION=11.0-jdk11-slim
   - VERSION=11.0-jdk11
   - VERSION=10.0-jre11-slim
   - VERSION=10.0-jre11
-  - VERSION=10.0-jdk14-slim
-  - VERSION=10.0-jdk14
+  - VERSION=10.0-jdk15-slim
+  - VERSION=10.0-jdk15
   - VERSION=10.0-jdk11-slim
   - VERSION=10.0-jdk11
   - VERSION=9.4-jre8-slim
@@ -22,8 +22,8 @@ env:
   - VERSION=9.4-jre11
   - VERSION=9.4-jdk8-slim
   - VERSION=9.4-jdk8
-  - VERSION=9.4-jdk14-slim
-  - VERSION=9.4-jdk14
+  - VERSION=9.4-jdk15-slim
+  - VERSION=9.4-jdk15
   - VERSION=9.4-jdk11-slim
   - VERSION=9.4-jdk11
   - VERSION=9.3-jre8
