@@ -52,7 +52,7 @@ for path in "${paths[@]}"; do
 				milestones+=("$candidate")
 			elif [[ "$candidate" == *.RC* ]]; then
 				releaseCandidates+=("$candidate")
-			elif [[ "$candidate" == *.v* ]]; then
+			elif [[ "$candidate" == *.v* || "$candidate" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 				fullReleases+=("$candidate")
 			elif [[ "$candidate" == *alpha* ]]; then
 				alphaReleases+=("$candidate")
