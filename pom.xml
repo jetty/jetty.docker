@@ -11,7 +11,7 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <jetty.version>9.4.35.v20201120</jetty.version>
+    <jetty.version>11.0.0</jetty.version>
     <junit.version>5.7.0</junit.version>
     <testcontainers.version>1.15.1</testcontainers.version>
     <slf4j.version>1.7.30</slf4j.version>
