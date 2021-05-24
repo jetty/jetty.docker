@@ -4,9 +4,9 @@ shopt -s globstar
 
 declare -A aliases
 aliases=(
-	[9.4-jdk15]='latest jdk15'
+	[9.4-jdk16]='latest jdk16'
 )
-defaultJdk="jdk15"
+defaultJdk="jdk16"
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
