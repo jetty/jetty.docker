@@ -67,7 +67,7 @@ public class DockerTests
     {
         // Start a jetty docker image with this imageTag, binding the directory of a simple webapp.
         String bindDir = "/var/lib/jetty/webapps/test-webapp";
-        try (GenericContainer container = new GenericContainer("jetty:" + imageTag)
+        try (GenericContainer<?> container = new GenericContainer<>("jetty:" + imageTag)
             .withExposedPorts(8080)
             .withClasspathResourceMapping("test-webapp", bindDir, BindMode.READ_ONLY))
         {
