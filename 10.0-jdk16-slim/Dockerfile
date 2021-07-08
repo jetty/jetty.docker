@@ -50,9 +50,11 @@ RUN set -xe ; \
 	for key in $JETTY_GPG_KEYS; do \
 		for server in \
 			ha.pool.sks-keyservers.net \
-			p80.pool.sks-keyservers.net:80 \
-			ipv4.pool.sks-keyservers.net \
-			pgp.mit.edu ; \
+			pgp.mit.edu \
+			hkp://p80.pool.sks-keyservers.net:80 \
+			hkp://keyserver.ubuntu.com:80 \
+			keyserver.pgp.com \
+			ipv4.pool.sks-keyservers.net ; \
 		do \
 			if gpg --batch --keyserver "$server" --recv-keys "$key"; then \
 				break; \
