@@ -79,10 +79,10 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 			cat >&2 <<- EOWARN
 			********************************************************************
 			WARNING: The $JETTY_BASE/start.d directory has been modified since
-			         the $JETTY_START files was generated. Either delete
+			         the $JETTY_START files was generated.
+			         To avoid regeneration delays at start, either delete
 			         the $JETTY_START file or re-run /generate-jetty-start.sh
-			         from a Dockerfile. The $JETTY-START file will now be
-			         automatically regenerated.
+			         from a Dockerfile.
 			********************************************************************
 			EOWARN
 			/generate-jetty-start.sh
