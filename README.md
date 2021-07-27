@@ -1,6 +1,6 @@
 # About this Repo
 
-[![Build Status](https://travis-ci.com/eclipse/jetty.docker.svg?branch=master)](https://travis-ci.com/eclipse/jetty.docker)
+[![Build Status](https://jenkins.webtide.net/job/jetty.docker/job/master/badge/icon)](https://jenkins.webtide.net/job/jetty.docker/job/master/)
 
 This is the Git repo for the official images of [Jetty on Docker Hub](https://registry.hub.docker.com/_/jetty/).
 See the Hub page for the full readme on how to use the Docker image and for information regarding contributing and issues.
