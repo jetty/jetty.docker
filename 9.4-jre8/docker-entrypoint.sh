@@ -79,32 +79,18 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 			cat >&2 <<- EOWARN
 			********************************************************************
 			WARNING: The $JETTY_BASE/start.d directory has been modified since
-			         the $JETTY_START files was generated. Either delete 
-			         the $JETTY_START file or re-run 
-			             /generate-jetty.start.sh 
-			         from a Dockerfile
+			         the $JETTY_START files was generated.
+			         To avoid regeneration delays at start, either delete
+			         the $JETTY_START file or re-run /generate-jetty-start.sh
+			         from a Dockerfile.
 			********************************************************************
 			EOWARN
+			/generate-jetty-start.sh
 		fi
 		echo $(date +'%Y-%m-%d %H:%M:%S.000'):INFO:docker-entrypoint:jetty start from $JETTY_START
 		set -- $(cat $JETTY_START)
 	else
-		# Do a jetty dry run to set the final command.
-		JAVA="$1"
-		shift
-		DRY_RUN=$($JAVA $JAVA_OPTIONS "$@" --dry-run)
-		echo "$DRY_RUN" \
-			| egrep '[^ ]*java .* org\.eclipse\.jetty\.xml\.XmlConfiguration ' \
-			| sed -e 's/ -Djava.io.tmpdir=[^ ]*//g' -e 's/\\$//' \
-			> $JETTY_START
-
-		# If jetty.start doesn't have content then the dry-run failed.
-		if ! [ -s $JETTY_START ]; then
-		    echo "jetty dry run failed:"
-			echo "$DRY_RUN" | awk '/\\$/ { printf "%s", substr($0, 1, length($0)-1); next } 1'
-			exit
-		fi
-
+		/generate-jetty-start.sh
 		set -- $(cat $JETTY_START)
 	fi
 fi
