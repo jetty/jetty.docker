@@ -16,13 +16,6 @@ greaterThanOrEqualTo9.4 ()
 	fi
 }
 
-# Update the Travis CI Build Directories
-if ! command -v ./generateTravis.sh >/dev/null 2>&1 ; then
-	echo "WARNING: Run update script from the jetty.docker project directory to update the Travis CI file."
-else
-	./generateTravis.sh > .travis.yml
-fi
-
 # Update the docker files and scripts for every directory in paths.
 paths=( "$@" )
 if [ ${#paths[@]} -eq 0 ]; then
