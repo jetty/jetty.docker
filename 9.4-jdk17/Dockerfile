@@ -1,5 +1,5 @@
 # DO NOT EDIT. Edit baseDockerfile and use update.sh
-FROM openjdk:16-jdk
+FROM openjdk:17-jdk
 
 ENV JETTY_VERSION 9.4.43.v20210629
 ENV JETTY_HOME /usr/local/jetty
