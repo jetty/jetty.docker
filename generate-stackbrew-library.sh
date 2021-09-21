@@ -85,6 +85,8 @@ for path in "${paths[@]}"; do
 	echo "Tags:$(IFS=, ; echo "${tags[*]/#/ }")"
 	if [ -f "$directory/arches" ]; then
 		echo "Architectures: $(< "$directory/arches")"
+	else
+		echo "Architectures: amd64, arm64v8"
 	fi
 	echo "Directory: $directory"
 	echo "GitCommit: $commit"
