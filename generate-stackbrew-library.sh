@@ -3,10 +3,20 @@ set -ueo pipefail
 shopt -s globstar
 
 defaultJdk="jdk17"
+defaultVersions=("11.0" "10.0" "9.4")
+
+isDefaultVersion() {
+	for version in "${defaultVersions[@]}"; do
+		if [[ "$1" =~ ^"$version" ]]; then
+			return 0
+		fi
+	done
+
+	return 1
+}
+
 declare -A aliases
 aliases=(
-	[11.0-jdk17]='11'
-	[10.0-jdk17]='10'
 	[9.4-jdk17]='9 latest jdk17'
 	[9.3-jre8]='9.3'
 	[9.2-jre8]='9.2'
@@ -55,17 +65,18 @@ for path in "${paths[@]}"; do
 		# From Jetty 10 we no longer use the *.v* version format.
 		versionAliases+=("$version")
 	fi
-	while [[ "$version" == *.* ]]; do
-		version="${version%.*}"
-		versionAliases+=("$version")
+
+	partialVersion="$version"
+	while [[ "$partialVersion" == *.* ]]; do
+		partialVersion="${partialVersion%.*}"
+		versionAliases+=("$partialVersion")
 	done
 
 	# Output ${versionAliases[@]} without JDK
 	# e.g. 9.2.10, 9.2
 	if [ "$jdk" = "$defaultJdk" ]; then
 		for va in "${versionAliases[@]}"; do
-			# We can't specify only major version here as it might be duplicated for multiple minor versions with default JDK.
-			if [[ "$va" == *.* ]]; then
+			if [[ "$va" == *.* ]] || isDefaultVersion "$version"; then
 				addTag "$va"
 			fi
 		done
@@ -74,7 +85,9 @@ for path in "${paths[@]}"; do
 	# Output ${versionAliases[@]} with JDK suffixes
 	# e.g. 9.2.10-jre7, 9.2-jre7, 9-jre7, 9-jre11-slim
 	for va in "${versionAliases[@]}"; do
-		addTag "$va-$jdk"
+		if [[ "$va" == *.* ]] || isDefaultVersion "$version"; then
+			addTag "$va-$jdk"
+		fi
 	done
 
 	# Output custom aliases
