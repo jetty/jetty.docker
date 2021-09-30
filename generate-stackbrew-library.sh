@@ -17,7 +17,7 @@ isDefaultVersion() {
 
 declare -A aliases
 aliases=(
-	[9.4-jdk17]='9 latest jdk17'
+	[9.4-jdk17]='latest jdk17'
 	[9.3-jre8]='9.3'
 	[9.2-jre8]='9.2'
 )
