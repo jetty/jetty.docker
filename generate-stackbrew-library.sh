@@ -2,14 +2,17 @@
 set -ueo pipefail
 shopt -s globstar
 
+defaultJdk="jdk17"
 declare -A aliases
 aliases=(
-	[9.4-jdk17]='latest jdk17'
+	[11.0-jdk17]='11'
+	[10.0-jdk17]='10'
+	[9.4-jdk17]='9 latest jdk17'
+	[9.3-jre8]='9.3'
+	[9.2-jre8]='9.2'
 )
-defaultJdk="jdk17"
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
-
 paths=( **/*/Dockerfile )
 paths=( $( printf '%s\n' "${paths[@]%/Dockerfile}" | egrep '^[0-9]' | sort -t/ -k 1,1Vr -k 2,2 ) )
 url='https://github.com/eclipse/jetty.docker.git'
@@ -47,23 +50,24 @@ for path in "${paths[@]}"; do
 
 	# Collect the potential version aliases
 	declare -a versionAliases
-	if [[ "$version" == *.v* ]]; then
-		# Release version
-		versionAliases=()
-		while [[ "$version" == *.* ]]; do
-			version="${version%.*}"
-			versionAliases+=("$version")
-		done
-	else
-		# Non-release version
-		versionAliases=("$version")
+	versionAliases=()
+	if [[ "$version" != *.v* ]]; then
+		# From Jetty 10 we no longer use the *.v* version format.
+		versionAliases+=("$version")
 	fi
+	while [[ "$version" == *.* ]]; do
+		version="${version%.*}"
+		versionAliases+=("$version")
+	done
 
 	# Output ${versionAliases[@]} without JDK
-	# e.g. 9.2.10, 9.2, 9 
+	# e.g. 9.2.10, 9.2
 	if [ "$jdk" = "$defaultJdk" ]; then
 		for va in "${versionAliases[@]}"; do
-			addTag "$va"
+			# We can't specify only major version here as it might be duplicated for multiple minor versions with default JDK.
+			if [[ "$va" == *.* ]]; then
+				addTag "$va"
+			fi
 		done
 	fi
 
