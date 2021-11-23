@@ -85,12 +85,12 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 			         from a Dockerfile.
 			********************************************************************
 			EOWARN
-			/generate-jetty-start.sh
+			/generate-jetty-start.sh "$@"
 		fi
 		echo $(date +'%Y-%m-%d %H:%M:%S.000'):INFO:docker-entrypoint:jetty start from $JETTY_START
 		set -- $(cat $JETTY_START)
 	else
-		/generate-jetty-start.sh
+		/generate-jetty-start.sh "$@"
 		set -- $(cat $JETTY_START)
 	fi
 fi

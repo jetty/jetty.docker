@@ -4,7 +4,7 @@ if [ -z "$JETTY_START" ] ; then
 	JETTY_START=$JETTY_BASE/jetty.start
 fi
 rm -f $JETTY_START
-		DRY_RUN=$(/docker-entrypoint.sh --dry-run)
+		DRY_RUN=$(/docker-entrypoint.sh "$@" --dry-run)
 		echo "$DRY_RUN" \
 			| egrep '[^ ]*java .* org\.eclipse\.jetty\.xml\.XmlConfiguration ' \
 			| sed -e 's/ -Djava.io.tmpdir=[^ ]*//g' -e 's/\\$//' \
