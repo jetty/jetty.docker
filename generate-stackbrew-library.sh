@@ -4,6 +4,7 @@ shopt -s globstar
 
 defaultJdk="jdk17"
 defaultVersions=("11.0" "10.0" "9.4")
+defaultImage="openjdk"
 
 isDefaultVersion() {
 	for version in "${defaultVersions[@]}"; do
@@ -17,9 +18,9 @@ isDefaultVersion() {
 
 declare -A aliases
 aliases=(
-	[9.4-jdk17]='latest jdk17'
-	[9.3-jre8]='9.3'
-	[9.2-jre8]='9.2'
+	[openjdk-9.4-jdk17]='latest jdk17'
+	[openjdk-9.3-jre8]='9.3'
+	[openjdk-9.2-jre8]='9.2'
 )
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -53,9 +54,10 @@ for path in "${paths[@]}"; do
 	directory="$path"
 	commit="$(git log -1 --format='format:%H' -- "$directory")"
 	version="$(grep -m1 'ENV JETTY_VERSION ' "$directory/Dockerfile" | cut -d' ' -f3)"
-
-	# Determine the JDK
-	jdk=$(expr "$path" : '.*\/\([^/]\+\)')
+	baseImage="${path%%/*}"
+	remainingPath="${path#*/}"
+	version="${remainingPath%%/*}"
+	jdk="${remainingPath#*/}"
 
 	# Collect the potential version aliases
 	declare -a versionAliases
@@ -71,28 +73,50 @@ for path in "${paths[@]}"; do
 		versionAliases+=("$partialVersion")
 	done
 
-	# Output ${versionAliases[@]} without JDK
-	# e.g. 9.2.10, 9.2
-	if [ "$jdk" = "$defaultJdk" ]; then
+	# If this is the default base image we don't need to include the base image name in the tag.
+	if [ "$baseImage" = "$defaultImage" ]; then
+		# Output ${versionAliases[@]} without JDK.
+		# e.g. 9.2.10, 9.2
+		if [ "$jdk" = "$defaultJdk" ]; then
+			for va in "${versionAliases[@]}"; do
+				if [[ "$va" == *.* ]] || isDefaultVersion "$version"; then
+					addTag "$va"
+				fi
+			done
+		fi
+
+		# Output ${versionAliases[@]} with JDK suffixes.
+		# e.g. 9.2.10-jre7, 9.2-jre7, 9-jre7, 9-jre11-slim
 		for va in "${versionAliases[@]}"; do
 			if [[ "$va" == *.* ]] || isDefaultVersion "$version"; then
-				addTag "$va"
+				addTag "$va-$jdk"
 			fi
 		done
 	fi
 
-	# Output ${versionAliases[@]} with JDK suffixes
-	# e.g. 9.2.10-jre7, 9.2-jre7, 9-jre7, 9-jre11-slim
+	# Output ${versionAliases[@]} without JDK, with the base image name.
+	# e.g. 9.2.10-openjdk, 9.2-openjdk
+	if [ "$jdk" = "$defaultJdk" ]; then
+		for va in "${versionAliases[@]}"; do
+			if [[ "$va" == *.* ]] || isDefaultVersion "$version"; then
+				addTag "$va-$baseImage"
+			fi
+		done
+	fi
+
+	# Output ${versionAliases[@]} with JDK suffixes and baseImage.
+	# e.g. 9.2.10-jre7-openjdk, 9.2-jre7-openjdk, 9-jre7-openjdk, 9-jre11-slim-openjdk
 	for va in "${versionAliases[@]}"; do
 		if [[ "$va" == *.* ]] || isDefaultVersion "$version"; then
-			addTag "$va-$jdk"
+			addTag "$va-$jdk-$baseImage"
 		fi
 	done
 
 	# Output custom aliases
 	# e.g. latest, jre7, jre8
-	if [ ${#aliases[$path]} -gt 0 ]; then
-		for va in ${aliases[$path]}; do
+	reference="$baseImage-$version-$jdk"
+	if [ ${#aliases[$reference]} -gt 0 ]; then
+		for va in ${aliases[$reference]}; do
 			addTag "$va"
 		done
 	fi
