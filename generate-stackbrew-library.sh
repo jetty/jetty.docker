@@ -23,8 +23,7 @@ aliases=(
 )
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
-paths=( **/*/Dockerfile )
-paths=( $( printf '%s\n' "${paths[@]%/Dockerfile}" | egrep '^[0-9]' | sort -t/ -k 1,1Vr -k 2,2 ) )
+paths=( $(find -mindepth 4 -maxdepth 4 -name "Dockerfile" | sed -e 's/\.\///' | sed -e 's/\/Dockerfile//' | sort -nr) )
 url='https://github.com/eclipse/jetty.docker.git'
 
 cat <<-EOH
@@ -56,7 +55,7 @@ for path in "${paths[@]}"; do
 	version="$(grep -m1 'ENV JETTY_VERSION ' "$directory/Dockerfile" | cut -d' ' -f3)"
 
 	# Determine the JDK
-	jdk=${path#*-} # "jre7"
+	jdk=$(expr "$path" : '.*\/\([^/]\+\)')
 
 	# Collect the potential version aliases
 	declare -a versionAliases

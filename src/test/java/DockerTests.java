@@ -1,7 +1,6 @@
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,7 +27,6 @@ import static org.hamcrest.Matchers.is;
 public class DockerTests
 {
     private static final Logger LOG = LoggerFactory.getLogger(DockerTests.class);
-    private static final Pattern PATTERN = Pattern.compile("^[0-9]+\\.[0-9]*-.*");
     private static final String USER_DIR = System.getProperty("user.dir");
     private static List<String> imageTags;
     private static HttpClient httpClient;
@@ -44,9 +42,9 @@ public class DockerTests
         LOG.info("Running tests with user directory: {}", USER_DIR);
 
         // Assemble a list of all the jetty image tags we need to test.
-        imageTags = Files.list(Paths.get(USER_DIR))
-            .map(path -> path.getFileName().toString())
-            .filter(fileName -> PATTERN.matcher(fileName).matches())
+        imageTags = Files.walk(Paths.get(USER_DIR), 4)
+            .filter(path -> path.endsWith("Dockerfile"))
+            .map(path -> path.getParent().getFileName().toString())
             .collect(Collectors.toList());
         LOG.info("jetty.docker image tags: {}", imageTags);
 
