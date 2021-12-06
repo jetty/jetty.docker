@@ -71,7 +71,7 @@ for path in "${paths[@]}"; do
 	remainingPath="${path#*/}"
 	version="${remainingPath%%/*}" # "9.2"
 	imageTag="${remainingPath#*/}"
-	variant=$( [[ $imageTag == *"slim"* ]] && echo "slim" )
+	variant=$( [[ $imageTag == *"alpine"* ]] && echo "alpine" )
 
 	fullVersion=$(getFullVersion $version)
 	if [ -z "$fullVersion" ]; then

@@ -1,4 +1,4 @@
-# DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
+# DO NOT EDIT. Edit baseDockerfile and use update.sh
 FROM openjdk:8-jre-slim
 
 ENV JETTY_VERSION 9.4.44.v20210927

@@ -1,4 +1,4 @@
-# DO NOT EDIT. Edit baseDockerfile and use update.sh
+# DO NOT EDIT. Edit baseDockerfile-alpine and use update.sh
 FROM eclipse-temurin:11-jdk-alpine
 
 ENV JETTY_VERSION 9.4.44.v20210927
@@ -30,6 +30,11 @@ ENV JETTY_GPG_KEYS \
 	F254B35617DC255D9344BCFA873A8E86B4372146
 
 RUN set -xe ; \
+	mkdir -p $TMPDIR ; \
+	#
+	# Install utils needed to verify keys
+	apk add --no-cache gnupg curl ; \
+	#
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
 	mkdir -p "$GNUPGHOME" ; \
@@ -66,7 +71,6 @@ RUN set -xe ; \
 	cd $JETTY_BASE ; \
 	java -jar "$JETTY_HOME/start.jar" --create-startd \
 		--add-to-start="server,http,deploy,jsp,jstl,ext,resources,websocket" ; \
-	mkdir -p "$TMPDIR" ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
 	usermod -d $JETTY_BASE jetty ; \
