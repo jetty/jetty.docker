@@ -79,6 +79,8 @@ for path in "${paths[@]}"; do
 		variant="slim"
 	elif [[ $baseImage == "eclipse-temurin" ]]; then
 		variant="slim"
+	elif [[ $baseImage == "amazoncorretto" ]]; then
+		variant="amazoncorretto"
 	else
 		variant=""
 	fi
