@@ -8,6 +8,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.util.StringUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -44,9 +45,19 @@ public class DockerTests
         // Assemble a list of all the jetty image tags we need to test.
         imageTags = Files.walk(Paths.get(USER_DIR), 4)
             .filter(path -> path.endsWith("Dockerfile"))
-            .map(path -> path.getParent().getFileName().toString())
+            .filter(path ->
+            {
+                String version = path.getParent().getParent().getFileName().toString();
+                return !StringUtil.isEmpty(version) && Character.isDigit(version.charAt(0));
+            })
+            .map(path ->
+            {
+                String version = path.getParent().getParent().getFileName().toString();
+                String tag = path.getParent().getFileName().toString();
+                return version + "-" + tag;
+            })
             .collect(Collectors.toList());
-        LOG.info("jetty.docker image tags: {}", imageTags);
+        LOG.info("{} jetty.docker image tags: {}", imageTags.size(), imageTags);
 
         httpClient = new HttpClient();
         httpClient.start();
