@@ -1,7 +1,6 @@
-# DO NOT EDIT. Edit baseDockerfile and use update.sh
-FROM amazoncorretto:8
+FROM IMAGE:TAG
 
-ENV JETTY_VERSION 11.0.7
+ENV JETTY_VERSION VERSION
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
@@ -106,4 +105,3 @@ USER jetty
 EXPOSE 8080
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["java","-jar","/usr/local/jetty/start.jar"]
-

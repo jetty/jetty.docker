@@ -71,9 +71,8 @@ RUN set -xe ; \
 	cd $JETTY_BASE ; \
 	java -jar "$JETTY_HOME/start.jar" --create-startd \
 		--add-to-start="server,http,deploy,jsp,jstl,ext,resources,websocket" ; \
-	groupadd -r jetty && useradd -r -g jetty jetty ; \
+	addgroup -S jetty && adduser -h $JETTY_BASE -S jetty -G jetty; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
-	usermod -d $JETTY_BASE jetty ; \
 	#
 	# Cleanup
 	rm -rf /tmp/hsperfdata_root ; \
@@ -91,4 +90,3 @@ USER jetty
 EXPOSE 8080
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["java","-jar","/usr/local/jetty/start.jar"]
-

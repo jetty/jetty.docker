@@ -71,15 +71,16 @@ for path in "${paths[@]}"; do
 	remainingPath="${path#*/}"
 	version="${remainingPath%%/*}" # "9.2"
 	imageTag="${remainingPath#*/}"
+	variant=$( [[ $imageTag == *"slim"* ]] && echo "slim" )
 	variant=$( [[ $imageTag == *"alpine"* ]] && echo "alpine" )
 
 	fullVersion=$(getFullVersion $version)
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "Unable to find Jetty package for $path"
 		exit 1
-	else
-		echo Full Version "${fullVersion}"
 	fi
+
+	echo "$fullVersion - $version-$baseImage-$imageTag"
 
 	if [ -d "$path" ]; then
 		# Exclude 9.2 from updated script files.
