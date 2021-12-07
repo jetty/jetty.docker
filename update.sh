@@ -71,8 +71,17 @@ for path in "${paths[@]}"; do
 	remainingPath="${path#*/}"
 	version="${remainingPath%%/*}" # "9.2"
 	imageTag="${remainingPath#*/}"
-	variant=$( [[ $imageTag == *"slim"* ]] && echo "slim" )
-	variant=$( [[ $imageTag == *"alpine"* ]] && echo "alpine" )
+
+	# Select the variant of the baseDockerfile to use.
+	if [[ $imageTag == *"alpine"* ]]; then
+		variant="alpine"
+	elif [[ $imageTag == *"slim"* ]]; then
+		variant="slim"
+	elif [[ $baseImage == "eclipse-temurin" ]]; then
+		variant="slim"
+	else
+		variant=""
+	fi
 
 	fullVersion=$(getFullVersion $version)
 	if [ -z "$fullVersion" ]; then
@@ -80,7 +89,7 @@ for path in "${paths[@]}"; do
 		exit 1
 	fi
 
-	echo "$fullVersion - $version-$baseImage-$imageTag"
+	echo "Update $path - $fullVersion - $variant"
 
 	if [ -d "$path" ]; then
 		# Exclude 9.2 from updated script files.

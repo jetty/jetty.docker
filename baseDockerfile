@@ -32,15 +32,6 @@ RUN set -xe ; \
 	#
 	mkdir -p $TMPDIR ; \
 	#
-	# Install utils needed to verify keys
-	apt-get update ; \
-	apt-get install -y --no-install-recommends \
-		ca-certificates \
-		p11-kit \
-		gnupg \
-		curl \
-		; \
-	#
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
 	mkdir -p "$GNUPGHOME" ; \
