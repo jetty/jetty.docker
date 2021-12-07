@@ -47,14 +47,20 @@ public class DockerTests
             .filter(path -> path.endsWith("Dockerfile"))
             .filter(path ->
             {
+                String baseImage = path.getParent().getParent().getParent().getFileName().toString();
                 String version = path.getParent().getParent().getFileName().toString();
-                return !StringUtil.isEmpty(version) && Character.isDigit(version.charAt(0));
+                String tag = path.getParent().getFileName().toString();
+                return !StringUtil.isEmpty(baseImage)
+                    && !StringUtil.isEmpty(version)
+                    && !StringUtil.isEmpty(tag)
+                    && Character.isDigit(version.charAt(0));
             })
             .map(path ->
             {
+                String baseImage = path.getParent().getParent().getParent().getFileName().toString();
                 String version = path.getParent().getParent().getFileName().toString();
                 String tag = path.getParent().getFileName().toString();
-                return version + "-" + tag;
+                return version + "-" + tag + "-" + baseImage;
             })
             .collect(Collectors.toList());
         LOG.info("{} jetty.docker image tags: {}", imageTags.size(), imageTags);
