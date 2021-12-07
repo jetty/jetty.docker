@@ -7,8 +7,8 @@ defaultVersions=("11.0" "10.0" "9.4")
 defaultImage="openjdk"
 
 isDefaultVersion() {
-	for version in "${defaultVersions[@]}"; do
-		if [[ "$1" =~ ^"$version" ]]; then
+	for v in "${defaultVersions[@]}"; do
+		if [[ "$1" =~ ^"$v" ]]; then
 			return 0
 		fi
 	done
@@ -53,21 +53,21 @@ for path in "${paths[@]}"; do
 
 	directory="$path"
 	commit="$(git log -1 --format='format:%H' -- "$directory")"
-	version="$(grep -m1 'ENV JETTY_VERSION ' "$directory/Dockerfile" | cut -d' ' -f3)"
+	fullVersion="$(grep -m1 'ENV JETTY_VERSION ' "$directory/Dockerfile" | cut -d' ' -f3)"
 	baseImage="${path%%/*}"
 	remainingPath="${path#*/}"
 	version="${remainingPath%%/*}"
 	jdk="${remainingPath#*/}"
 
-	# Collect the potential version aliases
+	# Collect the potential fullVersion aliases
 	declare -a versionAliases
 	versionAliases=()
-	if [[ "$version" != *.v* ]]; then
-		# From Jetty 10 we no longer use the *.v* version format.
-		versionAliases+=("$version")
+	if [[ "$fullVersion" != *.v* ]]; then
+		# From Jetty 10 we no longer use the *.v* fullVersion format.
+		versionAliases+=("$fullVersion")
 	fi
 
-	partialVersion="$version"
+	partialVersion="$fullVersion"
 	while [[ "$partialVersion" == *.* ]]; do
 		partialVersion="${partialVersion%.*}"
 		versionAliases+=("$partialVersion")
@@ -79,7 +79,7 @@ for path in "${paths[@]}"; do
 		# e.g. 9.2.10, 9.2
 		if [ "$jdk" = "$defaultJdk" ]; then
 			for va in "${versionAliases[@]}"; do
-				if [[ "$va" == *.* ]] || isDefaultVersion "$version"; then
+				if [[ "$va" == *.* ]] || isDefaultVersion "$fullVersion"; then
 					addTag "$va"
 				fi
 			done
@@ -88,7 +88,7 @@ for path in "${paths[@]}"; do
 		# Output ${versionAliases[@]} with JDK suffixes.
 		# e.g. 9.2.10-jre7, 9.2-jre7, 9-jre7, 9-jre11-slim
 		for va in "${versionAliases[@]}"; do
-			if [[ "$va" == *.* ]] || isDefaultVersion "$version"; then
+			if [[ "$va" == *.* ]] || isDefaultVersion "$fullVersion"; then
 				addTag "$va-$jdk"
 			fi
 		done
@@ -98,7 +98,7 @@ for path in "${paths[@]}"; do
 	# e.g. 9.2.10-openjdk, 9.2-openjdk
 	if [ "$jdk" = "$defaultJdk" ]; then
 		for va in "${versionAliases[@]}"; do
-			if [[ "$va" == *.* ]] || isDefaultVersion "$version"; then
+			if [[ "$va" == *.* ]] || isDefaultVersion "$fullVersion"; then
 				addTag "$va-$baseImage"
 			fi
 		done
@@ -107,7 +107,7 @@ for path in "${paths[@]}"; do
 	# Output ${versionAliases[@]} with JDK suffixes and baseImage.
 	# e.g. 9.2.10-jre7-openjdk, 9.2-jre7-openjdk, 9-jre7-openjdk, 9-jre11-slim-openjdk
 	for va in "${versionAliases[@]}"; do
-		if [[ "$va" == *.* ]] || isDefaultVersion "$version"; then
+		if [[ "$va" == *.* ]] || isDefaultVersion "$fullVersion"; then
 			addTag "$va-$jdk-$baseImage"
 		fi
 	done
