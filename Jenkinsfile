@@ -5,12 +5,12 @@ pipeline {
   options {
     durabilityHint('PERFORMANCE_OPTIMIZED')
     buildDiscarder(logRotator(numToKeepStr: '7', artifactNumToKeepStr: '2'))
-    timeout(time: 120, unit: 'MINUTES')
+    timeout(time: 240, unit: 'MINUTES')
   }
   stages {
     stage( "Build / Test - JDK11" ) {
       agent { node { label 'linux' } }
-      options { timeout( time: 120, unit: 'MINUTES' ) }
+      options { timeout( time: 240, unit: 'MINUTES' ) }
       steps {
         container('jetty-build') {
           mavenBuild( "jdk11", "clean verify" )
