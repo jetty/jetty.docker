@@ -64,7 +64,7 @@ fi
 paths=( "${paths[@]%/}" )
 
 MAVEN_METADATA_URL='https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-server/maven-metadata.xml'
-available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(jettyVersion)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
+available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
 
 for path in "${paths[@]}"; do
 	imageTag="${path##*/}"
