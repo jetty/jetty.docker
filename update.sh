@@ -81,6 +81,10 @@ for path in "${paths[@]}"; do
 		variant="slim"
 	elif [[ $baseImage == "amazoncorretto" ]]; then
 		variant="amazoncorretto"
+	elif [[ $baseImage == "azul/zulu-openjdk" ]]; then
+		variant="slim"
+	elif [[ $baseImage == *"alpine"* ]]; then
+		variant="alpine"
 	else
 		variant=""
 	fi
