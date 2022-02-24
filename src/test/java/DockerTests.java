@@ -91,13 +91,6 @@ public class DockerTests
 
     @ParameterizedTest
     @MethodSource("getImageTags")
-    public void test(String imageTag) throws Exception
-    {
-        System.err.println(imageTag);
-    }
-
-    @ParameterizedTest
-    @MethodSource("getImageTags")
     public void testJettyDockerImage(String imageTag) throws Exception
     {
         // Start a jetty docker image with this imageTag, binding the directory of a simple webapp.
