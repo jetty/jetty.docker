@@ -24,7 +24,7 @@ aliases=(
 )
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
-paths=( $(find -mindepth 4 -maxdepth 4 -name "Dockerfile" | sed -e 's/\.\///' | sed -e 's/\/Dockerfile//' | sort -nr) )
+paths=( $(find -mindepth 4 -maxdepth 5 -name "Dockerfile" | sed -e 's/\.\///' | sed -e 's/\/Dockerfile//' | sort -nr) )
 url='https://github.com/eclipse/jetty.docker.git'
 
 cat <<-EOH
@@ -54,10 +54,14 @@ for path in "${paths[@]}"; do
 	directory="$path"
 	commit="$(git log -1 --format='format:%H' -- "$directory")"
 	fullVersion="$(grep -m1 'ENV JETTY_VERSION ' "$directory/Dockerfile" | cut -d' ' -f3)"
-	baseImage="${path%%/*}"
-	remainingPath="${path#*/}"
-	version="${remainingPath%%/*}"
-	jdk="${remainingPath#*/}"
+
+	imageTag="${path##*/}"
+	remainingPath="${path%/*}"
+	jettyVersion="${remainingPath##*/}" # "9.2"
+	baseImage="${remainingPath%/*}"
+
+	# We can't add a / in a tag so we must replace it.
+	baseImage="$(echo $baseImage | sed -r 's/\//-/g')"
 
 	# Collect the potential fullVersion aliases
 	declare -a versionAliases
@@ -77,7 +81,7 @@ for path in "${paths[@]}"; do
 	if [ "$baseImage" = "$defaultImage" ]; then
 		# Output ${versionAliases[@]} without JDK.
 		# e.g. 9.2.10, 9.2
-		if [ "$jdk" = "$defaultJdk" ]; then
+		if [ "$imageTag" = "$defaultJdk" ]; then
 			for va in "${versionAliases[@]}"; do
 				if [[ "$va" == *.* ]] || isDefaultVersion "$fullVersion"; then
 					addTag "$va"
@@ -89,14 +93,14 @@ for path in "${paths[@]}"; do
 		# e.g. 9.2.10-jre7, 9.2-jre7, 9-jre7, 9-jre11-slim
 		for va in "${versionAliases[@]}"; do
 			if [[ "$va" == *.* ]] || isDefaultVersion "$fullVersion"; then
-				addTag "$va-$jdk"
+				addTag "$va-$imageTag"
 			fi
 		done
 	fi
 
 	# Output ${versionAliases[@]} without JDK, with the base image name.
 	# e.g. 9.2.10-openjdk, 9.2-openjdk
-	if [ "$jdk" = "$defaultJdk" ]; then
+	if [ "$imageTag" = "$defaultJdk" ]; then
 		for va in "${versionAliases[@]}"; do
 			if [[ "$va" == *.* ]] || isDefaultVersion "$fullVersion"; then
 				addTag "$va-$baseImage"
@@ -108,13 +112,13 @@ for path in "${paths[@]}"; do
 	# e.g. 9.2.10-jre7-openjdk, 9.2-jre7-openjdk, 9-jre7-openjdk, 9-jre11-slim-openjdk
 	for va in "${versionAliases[@]}"; do
 		if [[ "$va" == *.* ]] || isDefaultVersion "$fullVersion"; then
-			addTag "$va-$jdk-$baseImage"
+			addTag "$va-$imageTag-$baseImage"
 		fi
 	done
 
 	# Output custom aliases
 	# e.g. latest, jre7, jre8
-	reference="$baseImage-$version-$jdk"
+	reference="$baseImage-$jettyVersion-$imageTag"
 	if [ ${#aliases[$reference]} -gt 0 ]; then
 		for va in ${aliases[$reference]}; do
 			addTag "$va"
