@@ -16,24 +16,9 @@ greaterThanOrEqualTo9.4 ()
 	fi
 }
 
-# Update the docker files and scripts for every directory in paths.
-paths=( "$@" )
-if [ ${#paths[@]} -eq 0 ]; then
-	paths=( $(ls | egrep '^[0-9]' | sort -nr) )
-fi
-paths=( "${paths[@]%/}" )
-
-MAVEN_METADATA_URL='https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-server/maven-metadata.xml'
-available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
-
-for path in "${paths[@]}"; do
-	version="${path%%-*}" # "9.2"
-	jvm="${path#*-}" # "jre11-slim"
-	disto=$(expr "$jvm" : '\(j..\)[0-9].*') # jre
-	variant=$(expr "$jvm" : '.*-\(.*\)') # slim
-	release=$(expr "$jvm" : 'j..\([0-9][0-9]*\).*') # 11
-	label=${release}-${disto}${variant:+-$variant} # 11-jre-slim
-
+getFullVersion()
+{
+	version=$1
 	milestones=()
 	releaseCandidates=()
 	alphaReleases=()
@@ -68,12 +53,45 @@ for path in "${paths[@]}"; do
 		fullVersion="$alphaReleases"
 	fi
 
+	echo $fullVersion
+}
+
+# Update the docker files and scripts for every directory in paths.
+paths=( "$@" )
+if [ ${#paths[@]} -eq 0 ]; then
+	paths=( $(find -mindepth 4 -maxdepth 4 -name "Dockerfile" | sed -e 's/\.\///' | sed -e 's/\/Dockerfile//' | sort -nr) )
+fi
+paths=( "${paths[@]%/}" )
+
+MAVEN_METADATA_URL='https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-server/maven-metadata.xml'
+available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
+
+for path in "${paths[@]}"; do
+	baseImage="${path%%/*}" # first segment of path will be base image.
+	remainingPath="${path#*/}"
+	version="${remainingPath%%/*}" # "9.2"
+	imageTag="${remainingPath#*/}"
+
+	# Select the variant of the baseDockerfile to use.
+	if [[ $imageTag == *"alpine"* ]]; then
+		variant="alpine"
+	elif [[ $imageTag == *"slim"* ]]; then
+		variant="slim"
+	elif [[ $baseImage == "eclipse-temurin" ]]; then
+		variant="slim"
+	elif [[ $baseImage == "amazoncorretto" ]]; then
+		variant="amazoncorretto"
+	else
+		variant=""
+	fi
+
+	fullVersion=$(getFullVersion $version)
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "Unable to find Jetty package for $path"
 		exit 1
 	fi
 
-	echo Full Version "${fullVersion}"
+	echo "Update $path - $fullVersion - $variant"
 
 	if [ -d "$path" ]; then
 		# Exclude 9.2 from updated script files.
@@ -83,13 +101,17 @@ for path in "${paths[@]}"; do
 
 		# Only generate docker file for versions past 9.4, otherwise just update existing Dockerfile.
 		if greaterThanOrEqualTo9.4 "${version}"; then
+
+			# Maintain the existing base image tag.
+			prevTag=$(cat "$path"/Dockerfile | egrep "FROM $baseImage" | sed "s/.*FROM $baseImage:\([^ ]\+\)/\1/")
+
 			# Generate the Dockerfile in the directory for this version.
 			echo "# DO NOT EDIT. Edit baseDockerfile${variant:+-$variant} and use update.sh" >"$path"/Dockerfile
 			cat "baseDockerfile${variant:+-$variant}" >>"$path"/Dockerfile
 
 			# Set the Jetty and JDK/JRE versions in the generated Dockerfile.
 			sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "$path/Dockerfile"
-			sed -ri 's/^(FROM openjdk:)LABEL/\1'"$label"'/; ' "$path/Dockerfile"
+			sed -ri 's/^FROM IMAGE:TAG/'"FROM $baseImage:$prevTag"'/; ' "$path/Dockerfile"
 		else
 			sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "$path/Dockerfile"
 		fi
