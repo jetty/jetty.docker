@@ -37,18 +37,7 @@ RUN set -xe ; \
 	export GNUPGHOME=/jetty-keys ; \
 	mkdir -p "$GNUPGHOME" ; \
 	for key in $JETTY_GPG_KEYS; do \
-		for server in \
-			ha.pool.sks-keyservers.net \
-			pgp.mit.edu \
-			hkp://p80.pool.sks-keyservers.net:80 \
-			hkp://keyserver.ubuntu.com:80 \
-			keyserver.pgp.com \
-			ipv4.pool.sks-keyservers.net ; \
-		do \
-			if gpg --batch --keyserver "$server" --recv-keys "$key"; then \
-				break; \
-			fi; \
-		done; \
+		gpg --batch --keyserver "hkps://keyserver.ubuntu.com" --recv-keys "$key"; \
 	done ; \
 	#
 	# Fetch jetty release into JETTY_HOME
