@@ -2,13 +2,13 @@
 
 greaterThanOrEqualTo9.4 ()
 {
-	# If version is not numerical it cannot be compared properly.
+	# If jettyVersion is not numerical it cannot be compared properly.
 	if [[ ! $1 =~ ^[0-9]+\.?[0-9]*$ ]]; then
-		echo "Invalid version $1"
+		echo "Invalid jettyVersion $1"
 		exit 1
 	fi
 
-	# Compare version numerically using awk.
+	# Compare jettyVersion numerically using awk.
 	if awk 'BEGIN{exit ARGV[1]>=ARGV[2]}' "$1" "9.4"; then
 		return 1
 	else
@@ -18,14 +18,14 @@ greaterThanOrEqualTo9.4 ()
 
 getFullVersion()
 {
-	version=$1
+	jettyVersion=$1
 	milestones=()
 	releaseCandidates=()
 	alphaReleases=()
 	betaReleases=()
 	fullReleases=()
 	for candidate in "${available[@]}"; do
-		if [[ "$candidate" == "$version".* ]]; then
+		if [[ "$candidate" == "$jettyVersion".* ]]; then
 			if [[ "$candidate" == *.M* ]]; then
 				milestones+=("$candidate")
 			elif [[ "$candidate" == *.RC* ]]; then
@@ -59,7 +59,7 @@ getFullVersion()
 # Update the docker files and scripts for every directory in paths.
 paths=( "$@" )
 if [ ${#paths[@]} -eq 0 ]; then
-	paths=( $(find -mindepth 4 -maxdepth 4 -name "Dockerfile" | sed -e 's/\.\///' | sed -e 's/\/Dockerfile//' | sort -nr) )
+	paths=( $(find -mindepth 4 -maxdepth 5 -name "Dockerfile" | sed -e 's/\.\///' | sed -e 's/\/Dockerfile//' | sort -nr) )
 fi
 paths=( "${paths[@]%/}" )
 
@@ -67,10 +67,10 @@ MAVEN_METADATA_URL='https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-serve
 available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
 
 for path in "${paths[@]}"; do
-	baseImage="${path%%/*}" # first segment of path will be base image.
-	remainingPath="${path#*/}"
-	version="${remainingPath%%/*}" # "9.2"
-	imageTag="${remainingPath#*/}"
+	imageTag="${path##*/}"
+	remainingPath="${path%/*}"
+	jettyVersion="${remainingPath##*/}" # "9.2"
+	baseImage="${remainingPath%/*}"
 
 	# Select the variant of the baseDockerfile to use.
 	if [[ $imageTag == *"alpine"* ]]; then
@@ -81,11 +81,15 @@ for path in "${paths[@]}"; do
 		variant="slim"
 	elif [[ $baseImage == "amazoncorretto" ]]; then
 		variant="amazoncorretto"
+	elif [[ $baseImage == "azul/zulu-openjdk" ]]; then
+		variant="slim"
+	elif [[ $baseImage == *"alpine"* ]]; then
+		variant="alpine"
 	else
 		variant=""
 	fi
 
-	fullVersion=$(getFullVersion $version)
+	fullVersion=$(getFullVersion $jettyVersion)
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "Unable to find Jetty package for $path"
 		exit 1
@@ -95,23 +99,22 @@ for path in "${paths[@]}"; do
 
 	if [ -d "$path" ]; then
 		# Exclude 9.2 from updated script files.
-		if [[ "$version" != "9.2" ]]; then
+		if [[ "$jettyVersion" != "9.2" ]]; then
 			cp docker-entrypoint.sh generate-jetty-start.sh "$path"
 		fi
 
-		# Only generate docker file for versions past 9.4, otherwise just update existing Dockerfile.
-		if greaterThanOrEqualTo9.4 "${version}"; then
-
+		# Only generate docker file for jettyVersions past 9.4, otherwise just update existing Dockerfile.
+		if greaterThanOrEqualTo9.4 "${jettyVersion}"; then
 			# Maintain the existing base image tag.
-			prevTag=$(cat "$path"/Dockerfile | egrep "FROM $baseImage" | sed "s/.*FROM $baseImage:\([^ ]\+\)/\1/")
+			prevTag=$(cat "$path"/Dockerfile | egrep "FROM $baseImage" | sed "s|.*FROM $baseImage:\([^ ]\+\)|\1|")
 
-			# Generate the Dockerfile in the directory for this version.
+			# Generate the Dockerfile in the directory for this jettyVersion.
 			echo "# DO NOT EDIT. Edit baseDockerfile${variant:+-$variant} and use update.sh" >"$path"/Dockerfile
 			cat "baseDockerfile${variant:+-$variant}" >>"$path"/Dockerfile
 
-			# Set the Jetty and JDK/JRE versions in the generated Dockerfile.
+			# Set the Jetty and JDK/JRE jettyVersions in the generated Dockerfile.
 			sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "$path/Dockerfile"
-			sed -ri 's/^FROM IMAGE:TAG/'"FROM $baseImage:$prevTag"'/; ' "$path/Dockerfile"
+			sed -ri 's|^FROM IMAGE:TAG|'"FROM $baseImage:$prevTag"'|; ' "$path/Dockerfile"
 		else
 			sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "$path/Dockerfile"
 		fi

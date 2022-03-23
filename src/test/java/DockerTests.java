@@ -1,4 +1,5 @@
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,11 +44,12 @@ public class DockerTests
         LOG.info("Running tests with user directory: {}", USER_DIR);
 
         // Assemble a list of all the jetty image tags we need to test.
-        imageTags = Files.walk(Paths.get(USER_DIR), 4)
+        Path userDir = Paths.get(USER_DIR);
+        imageTags = Files.walk(userDir, 5)
             .filter(path -> path.endsWith("Dockerfile"))
             .filter(path ->
             {
-                String baseImage = path.getParent().getParent().getParent().getFileName().toString();
+                String baseImage = getBaseImage(path);
                 String version = path.getParent().getParent().getFileName().toString();
                 String tag = path.getParent().getFileName().toString();
                 return !StringUtil.isEmpty(baseImage)
@@ -57,7 +59,7 @@ public class DockerTests
             })
             .map(path ->
             {
-                String baseImage = path.getParent().getParent().getParent().getFileName().toString();
+                String baseImage = getBaseImage(path);
                 String version = path.getParent().getParent().getFileName().toString();
                 String tag = path.getParent().getFileName().toString();
                 return version + "-" + tag + "-" + baseImage;
@@ -74,6 +76,17 @@ public class DockerTests
     {
         if (httpClient != null)
             httpClient.stop();
+    }
+
+    private static String getBaseImage(Path path)
+    {
+        Path userDir = Paths.get(USER_DIR);
+        if (userDir.equals(path.getParent().getParent().getParent().getParent()))
+            return path.getParent().getParent().getParent().getFileName().toString();
+        else if (userDir.equals(path.getParent().getParent().getParent().getParent().getParent()))
+            return path.getParent().getParent().getParent().getParent().getFileName().toString()
+                + "-" + path.getParent().getParent().getParent().getFileName().toString();
+        return null;
     }
 
     @ParameterizedTest
