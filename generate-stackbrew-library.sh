@@ -5,6 +5,7 @@ shopt -s globstar
 defaultJdk="jdk17"
 defaultVersions=("11.0" "10.0" "9.4")
 defaultImage="openjdk"
+excludedBases=()
 
 isDefaultVersion() {
 	for v in "${defaultVersions[@]}"; do
@@ -49,6 +50,14 @@ addTag() {
 }
 
 for path in "${paths[@]}"; do
+
+	# Skip if this image has been excluded.
+	for excluded in "${excludedBases[@]}"; do
+		if [[ "$path" =~ ^$excluded.* ]]; then
+        continue 2
+    fi
+	done
+
 	tags=()
 
 	directory="$path"
