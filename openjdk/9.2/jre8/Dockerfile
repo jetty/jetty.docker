@@ -28,19 +28,11 @@ ENV JETTY_GPG_KEYS \
 
 RUN set -xe \
 	&& mkdir /jetty-keys \
-        && export GNUPGHOME=/jetty-keys; \
-        for key in $JETTY_GPG_KEYS; do \
-                for server in \
-                        ha.pool.sks-keyservers.net \
-                        p80.pool.sks-keyservers.net:80 \
-                        ipv4.pool.sks-keyservers.net \
-                        pgp.mit.edu ; \
-                do \
-                        if gpg --batch --keyserver "$server" --recv-keys "$key"; then \
-                                break; \
-                        fi; \
-                done; \
-        done \
+    && export GNUPGHOME=/jetty-keys; \
+    	mkdir -p "$GNUPGHOME" ; \
+    	for key in $JETTY_GPG_KEYS; do \
+    		gpg --batch --keyserver "hkps://keyserver.ubuntu.com" --recv-keys "$key"; \
+    	done \
 	&& mkdir -p "$JETTY_HOME" \
 	&& cd $JETTY_HOME \
 	&& curl -SL "$JETTY_TGZ_URL" -o jetty.tar.gz \
