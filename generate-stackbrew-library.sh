@@ -5,7 +5,7 @@ shopt -s globstar
 defaultJdk="jdk17"
 defaultVersions=("11.0" "10.0" "9.4")
 defaultImage="openjdk"
-excludedBases=()
+excludedBases=("azul")
 
 isDefaultVersion() {
 	for v in "${defaultVersions[@]}"; do
