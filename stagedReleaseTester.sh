@@ -39,40 +39,58 @@ for stagingNumber in "${stagingNumbers[@]}"; do
 done
 
 # Update the docker files and scripts for every directory in paths.
-paths=( $(ls | egrep '^[0-9]' | sort -nr) )
+paths=( $(find -mindepth 4 -maxdepth 5 -name "Dockerfile" | sed -e 's/\.\///' | sed -e 's/\/Dockerfile//' | sort -nr) )
 paths=( "${paths[@]%/}" )
 
 for path in "${paths[@]}"; do
-	version="${path%%-*}" # "9.2"
-	jvm="${path#*-}" # "jre11-slim"
-	disto=$(expr "$jvm" : '\(j..\)[0-9].*') # jre
-	variant=$(expr "$jvm" : '.*-\(.*\)') # slim
-	release=$(expr "$jvm" : 'j..\([0-9][0-9]*\).*') # 11
-	label=${release}-${disto}${variant:+-$variant} # 11-jre-slim
+	imageTag="${path##*/}"
+	remainingPath="${path%/*}"
+	jettyVersion="${remainingPath##*/}" # "9.2"
+	baseImage="${remainingPath%/*}"
 
-	jettyHomeUrl="${jettyHomeFromPartialVersion[$version]}"
+	jettyHomeUrl="${jettyHomeFromPartialVersion[$jettyVersion]}"
 	if [ -z "$jettyHomeUrl" ]; then
 		echo "Did not Update: $path"
 		continue
 	fi
 
-	fullVersion="${fullVersionFromPartialVersion[$version]}"
+	fullVersion="${fullVersionFromPartialVersion[$jettyVersion]}"
 	if [ -z "$jettyHomeUrl" ]; then
 		echo "Did not Update: $path"
 		continue
 	fi
 
-	if greaterThanOrEqualTo9.4 "${version}"; then
-		cp docker-entrypoint.sh generate-jetty-start.sh "$path"
+	# Select the variant of the baseDockerfile to use.
+	if [[ $imageTag == *"alpine"* ]]; then
+		variant="alpine"
+	elif [[ $imageTag == *"slim"* ]]; then
+		variant="slim"
+	elif [[ $baseImage == "eclipse-temurin" ]]; then
+		variant="slim"
+	elif [[ $baseImage == "amazoncorretto" ]]; then
+		variant="amazoncorretto"
+	elif [[ $baseImage == "azul/zulu-openjdk" ]]; then
+		variant="slim"
+	elif [[ $baseImage == *"alpine"* ]]; then
+		variant="alpine"
+	else
+		variant=""
+	fi
 
-		# Generate the Dockerfile in the directory for this version.
+	if greaterThanOrEqualTo9.4 "${jettyVersion}"; then
+		# Maintain the existing base image tag.
+		prevTag=$(cat "$path"/Dockerfile | egrep "FROM $baseImage" | sed "s|.*FROM $baseImage:\([^ ]\+\)|\1|")
+
+		# Generate the Dockerfile in the directory for this jettyVersion.
 		echo "# DO NOT EDIT. Edit baseDockerfile${variant:+-$variant} and use update.sh" >"$path"/Dockerfile
 		cat "baseDockerfile${variant:+-$variant}" >>"$path"/Dockerfile
 
 		# Set the Jetty and JDK/JRE versions in the generated Dockerfile.
 		sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "$path/Dockerfile"
+		sed -ri 's|^FROM IMAGE:TAG|'"FROM $baseImage:$prevTag"'|; ' "$path/Dockerfile"
+
+		# Set the URL of jetty-home.
 		sed -ri 's|^(ENV JETTY_TGZ_URL) .*|\1 '"$jettyHomeUrl"'|; ' "$path/Dockerfile"
-		sed -ri 's/^(FROM openjdk:)LABEL/\1'"$label"'/; ' "$path/Dockerfile"
 
 		echo "Successfully Updated: $path"
 	else
