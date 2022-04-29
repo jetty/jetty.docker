@@ -4,7 +4,7 @@ shopt -s globstar
 
 defaultJdk="jdk17"
 defaultVersions=("11.0" "10.0" "9.4")
-defaultImage="openjdk"
+defaultImage="eclipse-temurin"
 excludedBases=("azul")
 
 isDefaultVersion() {
@@ -19,7 +19,7 @@ isDefaultVersion() {
 
 declare -A aliases
 aliases=(
-	[openjdk-9.4-jdk17]='latest jdk17'
+	[eclipse-temurin-11.0-jdk17]='latest jdk17'
 	[openjdk-9.3-jre8]='9.3'
 	[openjdk-9.2-jre8]='9.2'
 )
