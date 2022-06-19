@@ -92,7 +92,7 @@ for path in "${paths[@]}"; do
 		# Set the URL of jetty-home.
 		sed -ri 's|^(ENV JETTY_TGZ_URL) .*|\1 '"$jettyHomeUrl"'|; ' "$path/Dockerfile"
 
-		echo "Successfully Updated: $path"
+		echo "Successfully Updated: $path to $fullVersion"
 	else
 		echo "Did not Update: $path"
 	fi
