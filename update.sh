@@ -63,7 +63,10 @@ if [ ${#paths[@]} -eq 0 ]; then
 fi
 paths=( "${paths[@]%/}" )
 
-MAVEN_METADATA_URL='https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-server/maven-metadata.xml'
+REPOSITORY_URL="${REPOSITORY_URL:=https://repo1.maven.org/maven2/org/eclipse/jetty}"
+JETTY_HOME_URL="$REPOSITORY_URL/jetty-home/$JETTY_VERSION/jetty-home-$JETTY_VERSION.tar.gz"
+MAVEN_METADATA_URL="$REPOSITORY_URL/jetty-server/maven-metadata.xml"
+
 available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
 
 for path in "${paths[@]}"; do
@@ -115,8 +118,16 @@ for path in "${paths[@]}"; do
 			# Set the Jetty and JDK/JRE jettyVersions in the generated Dockerfile.
 			sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "$path/Dockerfile"
 			sed -ri 's|^FROM IMAGE:TAG|'"FROM $baseImage:$prevTag"'|; ' "$path/Dockerfile"
+
+			# Update repository URL.
+			sed -ri 's|^(ENV JETTY_TGZ_URL) .*|\1 '"$JETTY_HOME_URL"'|; ' "$path/Dockerfile"
 		else
+
+			# Update Jetty Version.
 			sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "$path/Dockerfile"
+
+			# Update repository URL.
+			sed -ri 's|^(ENV JETTY_TGZ_URL) .*|\1 '"$JETTY_HOME_URL"'|; ' "$path/Dockerfile"
 		fi
 	fi
 done
