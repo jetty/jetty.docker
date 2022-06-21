@@ -64,7 +64,8 @@ fi
 paths=( "${paths[@]%/}" )
 
 REPOSITORY_URL="${REPOSITORY_URL:=https://repo1.maven.org/maven2/org/eclipse/jetty}"
-JETTY_HOME_URL="$REPOSITORY_URL/jetty-home/$JETTY_VERSION/jetty-home-$JETTY_VERSION.tar.gz"
+JETTY_HOME_URL="$REPOSITORY_URL/jetty-home/\$JETTY_VERSION/jetty-home-\$JETTY_VERSION.tar.gz"
+JETTY_DISTRO_URL="$REPOSITORY_URL/jetty-distribution/\$JETTY_VERSION/jetty-distribution-\$JETTY_VERSION.tar.gz"
 MAVEN_METADATA_URL="$REPOSITORY_URL/jetty-server/maven-metadata.xml"
 
 available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
@@ -127,7 +128,7 @@ for path in "${paths[@]}"; do
 			sed -ri 's/^(ENV JETTY_VERSION) .*/\1 '"$fullVersion"'/; ' "$path/Dockerfile"
 
 			# Update repository URL.
-			sed -ri 's|^(ENV JETTY_TGZ_URL) .*|\1 '"$JETTY_HOME_URL"'|; ' "$path/Dockerfile"
+			sed -ri 's|^(ENV JETTY_TGZ_URL) .*|\1 '"$JETTY_DISTRO_URL"'|; ' "$path/Dockerfile"
 		fi
 	fi
 done
