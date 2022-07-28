@@ -20,8 +20,6 @@ isDefaultVersion() {
 declare -A aliases
 aliases=(
 	[eclipse-temurin-11.0-jdk17]='latest jdk17'
-	[openjdk-9.3-jre8]='9.3'
-	[openjdk-9.2-jre8]='9.2'
 )
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
