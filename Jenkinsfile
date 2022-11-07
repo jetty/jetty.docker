@@ -9,7 +9,7 @@ pipeline {
   }
   stages {
     stage( "Build / Test - JDK11" ) {
-      agent { node { label 'linux' } }
+      agent { node { label 'linux-test' } }
       options { timeout( time: 240, unit: 'MINUTES' ) }
       steps {
         mavenBuild( "jdk11", "clean verify" )
