@@ -126,8 +126,7 @@
                 </goals>
                 <configuration>
                   <executable>make</executable>
-                  <arguments>-f</arguments>
-                  <arguments>Makefile-ci</arguments>
+                  <arguments>--file=Makefile-ci</arguments>
                 </configuration>
               </execution>
             </executions>
