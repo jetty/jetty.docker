@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile-alpine and use update.sh
 FROM azul/zulu-openjdk-alpine:8
 
-ENV JETTY_VERSION 9.4.49.v20220914
+ENV JETTY_VERSION 9.4.50.v20221201
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
