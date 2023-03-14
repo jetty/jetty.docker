@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile-amazoncorretto and use update.sh
 FROM amazoncorretto:17
 
-ENV JETTY_VERSION 10.0.13
+ENV JETTY_VERSION 10.0.14
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
