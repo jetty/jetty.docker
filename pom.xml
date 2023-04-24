@@ -14,7 +14,7 @@
     <jetty.version>11.0.15</jetty.version>
     <junit.version>5.9.2</junit.version>
     <testcontainers.version>1.18.0</testcontainers.version>
-    <slf4j.version>2.0.6</slf4j.version>
+    <slf4j.version>2.0.7</slf4j.version>
     <hamcrest.version>2.2</hamcrest.version>
   </properties>
 
