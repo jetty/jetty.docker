@@ -61,7 +61,7 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 			# It is a terminating command, so exec directly
 			JAVA="$1"
 			shift
-			exec $JAVA $JAVA_OPTIONS "$@"
+			exec $JAVA $JAVA_OPTIONS "$@" $JETTY_PROPERTIES
 		esac
 	done
 
@@ -88,11 +88,13 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 			/generate-jetty-start.sh "$@"
 		fi
 		echo $(date +'%Y-%m-%d %H:%M:%S.000'):INFO:docker-entrypoint:jetty start from $JETTY_START
-		set -- $(cat $JETTY_START)
 	else
 		/generate-jetty-start.sh "$@"
-		set -- $(cat $JETTY_START)
 	fi
+
+	## The generate-jetty-start script always starts the jetty.start file with exec, so this command will exec Jetty.
+  ## We need to do this because the file may have quoted arguments which cannot be read into a variable.
+  . $JETTY_START
 fi
 
 if [ "${1##*/}" = java -a -n "$JAVA_OPTIONS" ] ; then
