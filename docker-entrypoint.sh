@@ -61,7 +61,7 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 			# It is a terminating command, so exec directly
 			JAVA="$1"
 			shift
-			exec $JAVA $JAVA_OPTIONS "$@" $JETTY_PROPERTIES
+			exec $JAVA $JAVA_OPTIONS "$@" $JAVA_OPTIONS $JETTY_PROPERTIES
 		esac
 	done
 
