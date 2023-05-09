@@ -61,6 +61,8 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 			# It is a terminating command, so exec directly
 			JAVA="$1"
 			shift
+			# The first $JAVA_OPTIONS is for the JVM which will do the --dry-run,
+			# the second one is used when generating the --dry-run output.
 			exec $JAVA $JAVA_OPTIONS "$@" $JAVA_OPTIONS $JETTY_PROPERTIES
 		esac
 	done
