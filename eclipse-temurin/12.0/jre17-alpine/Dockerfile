@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile-alpine and use update.sh
 FROM eclipse-temurin:17-jre-alpine
 
-ENV JETTY_VERSION 12.0.0.beta1
+ENV JETTY_VERSION 12.0.0.beta2
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
@@ -56,8 +56,12 @@ RUN set -xe ; \
 	# Create and configure the JETTY_HOME directory
 	mkdir -p "$JETTY_BASE" ; \
 	cd $JETTY_BASE ; \
+	case "$JETTY_VERSION" in \
+		"12."*) START_MODULES="server,http,deploy,ext,resources" ;; \
+		*) START_MODULES="server,http,deploy,ext,resources,jsp,jstl,websocket" ;; \
+	esac ; \
 	java -jar "$JETTY_HOME/start.jar" --create-startd \
-		--add-to-start="server,http,deploy,jsp,jstl,ext,resources,websocket" ; \
+		--add-to-start="$START_MODULES" ; \
 	addgroup -S jetty && adduser -h $JETTY_BASE -S jetty -G jetty; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
 	#
