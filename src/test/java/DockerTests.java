@@ -93,11 +93,16 @@ public class DockerTests
     @MethodSource("getImageTags")
     public void testJettyDockerImage(String imageTag) throws Exception
     {
+        String commandPrefix = "";
+        if (imageTag.contains("12.0"))
+            commandPrefix = "java -jar $JETTY_HOME/start.jar --add-to-start=ee10-deploy ; ";
+
         // Start a jetty docker image with this imageTag, binding the directory of a simple webapp.
         String bindDir = "/var/lib/jetty/webapps/test-webapp";
         try (GenericContainer<?> container = new GenericContainer<>("jetty:" + imageTag)
             .withExposedPorts(8080)
-            .withClasspathResourceMapping("test-webapp", bindDir, BindMode.READ_ONLY))
+            .withClasspathResourceMapping("test-webapp", bindDir, BindMode.READ_ONLY)
+            .withCommand("bash", "-c", commandPrefix + "/docker-entrypoint.sh"))
         {
             // Start the docker container and the server.
             container.start();
