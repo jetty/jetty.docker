@@ -102,7 +102,7 @@ public class DockerTests
         try (GenericContainer<?> container = new GenericContainer<>("jetty:" + imageTag)
             .withExposedPorts(8080)
             .withClasspathResourceMapping("test-webapp", bindDir, BindMode.READ_ONLY)
-            .withCommand("bash", "-c", commandPrefix + "/docker-entrypoint.sh"))
+            .withCommand("sh", "-c", commandPrefix + "/docker-entrypoint.sh"))
         {
             // Start the docker container and the server.
             container.start();
