@@ -65,8 +65,12 @@ RUN set -xe ; \
 	# Create and configure the JETTY_HOME directory
 	mkdir -p "$JETTY_BASE" ; \
 	cd $JETTY_BASE ; \
+	case "$JETTY_VERSION" in \
+		"12."*) START_MODULES="server,http,ext,resources" ;; \
+		*) START_MODULES="server,http,deploy,ext,resources,jsp,jstl,websocket" ;; \
+	esac ; \
 	java -jar "$JETTY_HOME/start.jar" --create-startd \
-		--add-to-start="server,http,deploy,jsp,jstl,ext,resources,websocket" ; \
+		--add-to-start="$START_MODULES" ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
 	usermod -d $JETTY_BASE jetty ; \
