@@ -95,7 +95,7 @@ public class DockerTests
     {
         String commandPrefix = "";
         if (imageTag.contains("12.0"))
-            commandPrefix = "java -jar $JETTY_HOME/start.jar --add-to-start=ee10-deploy ; ";
+            commandPrefix = "java -jar $JETTY_HOME/start.jar --add-to-start=core-deploy ; ";
 
         // Start a jetty docker image with this imageTag, binding the directory of a simple webapp.
         String bindDir = "/var/lib/jetty/webapps/test-webapp";
