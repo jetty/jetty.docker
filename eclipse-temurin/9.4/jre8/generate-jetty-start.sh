@@ -6,7 +6,7 @@ fi
 rm -f $JETTY_START
 		DRY_RUN=$(/docker-entrypoint.sh "$@" --dry-run)
 		echo "exec $DRY_RUN" \
-			| egrep '[^ ]*java .* org\.eclipse\.jetty\.xml\.XmlConfiguration ' \
+			| egrep '[^ ]*java .*org\.eclipse\.jetty\.xml\.XmlConfiguration ' \
 			| sed -e 's/ -Djava.io.tmpdir=[^ ]*//g' -e 's/\\$//' \
 			> $JETTY_START
 
