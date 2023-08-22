@@ -63,7 +63,8 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 			shift
 			# The first $JAVA_OPTIONS is for the JVM which will do the --dry-run,
 			# the second one is used when generating the --dry-run output.
-			eval "exec $JAVA $JAVA_OPTIONS \"\$@\" $JAVA_OPTIONS $JETTY_PROPERTIES"
+			echo "exec " $JAVA $JAVA_OPTIONS "$@" $JAVA_OPTIONS $JETTY_PROPERTIES > $JETTY_BASE/jetty.exec
+			. $JETTY_BASE/jetty.exec
 		esac
 	done
 
