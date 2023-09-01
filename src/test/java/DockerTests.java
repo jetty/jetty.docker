@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 @Testcontainers
+@SuppressWarnings("resource")
 public class DockerTests
 {
     private static final Logger LOG = LoggerFactory.getLogger(DockerTests.class);
