@@ -27,9 +27,9 @@ import static org.hamcrest.Matchers.is;
 
 @Testcontainers
 @SuppressWarnings("resource")
-public class DockerTests
+public class WelcomeFileTest
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DockerTests.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WelcomeFileTest.class);
     private static final String USER_DIR = System.getProperty("user.dir");
     private static List<String> imageTags;
     private static HttpClient httpClient;

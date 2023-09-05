@@ -5,32 +5,34 @@ import java.util.stream.Stream;
 import org.eclipse.jetty.client.HttpClient;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import util.ImageUtil;
+import util.LogConsumer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 
 @Testcontainers
 @SuppressWarnings("resource")
-public class EdgeCaseTests
+public class JavaOptionsTest
 {
-    private static final Logger LOG = LoggerFactory.getLogger(EdgeCaseTests.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JavaOptionsTest.class);
     private static List<String> imageTags;
     private static HttpClient httpClient;
 
     public static Stream<Arguments> getImageTags()
     {
-        return imageTags.stream().map(Arguments::of);
+        return imageTags.stream()
+            .map(tag -> Arguments.of(Named.of(tag, tag)));
     }
 
     @BeforeAll
@@ -50,8 +52,8 @@ public class EdgeCaseTests
             httpClient.stop();
     }
 
-    @ParameterizedTest()
-    @ValueSource(strings = {"evalexec", "echoexec", "experiment"})
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("getImageTags")
     public void testSystemPropertyWithSpaces(String imageTag) throws Exception
     {
         LogConsumer logConsumer = new LogConsumer();
@@ -69,16 +71,20 @@ public class EdgeCaseTests
     }
 
     @ParameterizedTest()
-    @ValueSource(strings = {"evalexec", "echoexec", "experiment"})
+    @MethodSource("getImageTags")
     public void testMultiLineJavaOpts(String imageTag) throws Exception
     {
         LogConsumer logConsumer = new LogConsumer();
-
         ImageFromDockerfile image = new ImageFromDockerfile()
-            .withFileFromClasspath("run.sh", "multi-line-test/run.sh")
-            .withFileFromClasspath("Dockerfile", "multi-line-test/Dockerfile_" + imageTag);
+            .withDockerfileFromBuilder(builder ->
+            {
+                builder.from("jetty:" + imageTag);
+                builder.entryPoint("chmod 755 /run.sh && /run.sh");
+                builder.user("root");
+            });
 
         try (GenericContainer<?> container = new GenericContainer<>(image)
+            .withClasspathResourceMapping("multi-line-test/run.sh", "/run.sh", BindMode.READ_ONLY)
             .withLogConsumer(logConsumer))
         {
             container.start();

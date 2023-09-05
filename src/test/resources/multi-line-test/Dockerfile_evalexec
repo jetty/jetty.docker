@@ -1,8 +1,0 @@
-FROM jetty:evalexec
-
-COPY run.sh /
-USER root
-ENTRYPOINT [ "/run.sh" ]
-RUN chmod 755 "/run.sh"
-USER jetty
-
