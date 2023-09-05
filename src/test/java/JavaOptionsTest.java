@@ -77,7 +77,7 @@ public class JavaOptionsTest
     }
 
     @Disabled("https://github.com/eclipse/jetty.docker/issues/153")
-    @ParameterizedTest()
+    @ParameterizedTest(name = "{0}")
     @MethodSource("getImageTags")
     public void testMultiLineJavaOpts(String imageTag) throws Exception
     {
@@ -109,7 +109,6 @@ public class JavaOptionsTest
         assertThat(log, containsString("org.eclipse.jetty.server.Request.maxFormContentSize = 2000000 (<command-line>)"));
     }
 
-    @Disabled("https://github.com/eclipse/jetty.docker/issues/160")
     @ParameterizedTest()
     @MethodSource("getImageTags")
     public void testRemoteJvmDebug(String imageTag) throws Exception
