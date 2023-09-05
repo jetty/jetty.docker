@@ -76,6 +76,7 @@ public class JavaOptionsTest
         assertThat(logString, containsString("testProp = foo   bar (<command-line>)"));
     }
 
+    @Disabled("https://github.com/eclipse/jetty.docker/issues/153")
     @ParameterizedTest()
     @MethodSource("getImageTags")
     public void testMultiLineJavaOpts(String imageTag) throws Exception

@@ -12,7 +12,5 @@ JAVA_OPTIONS="${JAVA_OPTIONS}
               -Dlogback.statusListenerClass=ch.qos.logback.core.status.OnConsoleStatusListener
               -Dorg.eclipse.jetty.server.Request.maxFormContentSize=2000000"
 
-JAVA_OPTIONS=`echo $JAVA_OPTIONS`
-
 export JAVA_OPTIONS
 /docker-entrypoint.sh --list-config
