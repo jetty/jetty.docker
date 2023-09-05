@@ -1,5 +1,6 @@
 package util;
 
+import java.time.Instant;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -32,6 +33,25 @@ public class LogConsumer implements Consumer<OutputFrame>
             System.err.print(logLine);
         if (outputFrame.getType() == OutputFrame.OutputType.END)
             complete.countDown();
+    }
+
+    public boolean awaitString(String pattern) throws InterruptedException
+    {
+        return awaitString(pattern, 5000);
+    }
+
+    public boolean awaitString(String pattern, long timeout) throws InterruptedException
+    {
+        Instant expiry = Instant.now().plusMillis(timeout);
+        while (true)
+        {
+            String logString = getLogString();
+            if (logString.contains(pattern))
+                return true;
+            if (Instant.now().isAfter(expiry))
+                return false;
+            Thread.sleep(200);
+        }
     }
 
     public String getLogString()
