@@ -5,8 +5,10 @@ if [ -z "$JETTY_START" ] ; then
 fi
 rm -f $JETTY_START
 		DRY_RUN=$(/docker-entrypoint.sh "$@" --dry-run)
-		DRY_RUN=$(echo "$DRY_RUN" | egrep '[^ ]*java .*org\.eclipse\.jetty\.xml\.XmlConfiguration ' | sed -e 's/ -Djava.io.tmpdir=[^ ]*//g' -e 's/\\$//')
-		echo "exec $DRY_RUN" > $JETTY_START
+		echo "exec $DRY_RUN" \
+			| egrep '[^ ]*java .*org\.eclipse\.jetty\.xml\.XmlConfiguration ' \
+			| sed -e 's/ -Djava.io.tmpdir=[^ ]*//g' -e 's/\\$//' \
+			> $JETTY_START
 
 		# If jetty.start doesn't have content then the dry-run failed.
 		if ! [ -s $JETTY_START ]; then
