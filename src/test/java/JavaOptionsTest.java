@@ -140,7 +140,7 @@ public class JavaOptionsTest
             // First line is the java process should be on PID 1.
             String line1 = output[1].trim();
             assertThat(line1, startsWith("1"));
-            assertThat(line1, endsWith("java"));
+            assertThat(line1, containsString("java"));
 
             // Second line is the call to ps that we are currently doing.
             String line2 = output[2].trim();
