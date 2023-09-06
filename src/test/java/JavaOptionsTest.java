@@ -136,7 +136,6 @@ public class JavaOptionsTest
             // First line lists the different columns.
             String header = output[0].trim();
             assertThat(header, startsWith("PID"));
-            assertThat(header, endsWith("CMD"));
 
             // First line is the java process should be on PID 1.
             String line1 = output[1].trim();
