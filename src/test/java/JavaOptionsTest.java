@@ -86,8 +86,11 @@ public class JavaOptionsTest
             .withDockerfileFromBuilder(builder ->
             {
                 builder.from("jetty:" + imageTag);
-                builder.entryPoint("chmod 755 /run.sh && /run.sh");
+                builder.entryPoint("/run.sh");
                 builder.user("root");
+                builder.run("chmod", "755", "/run.sh");
+                builder.run("chown", "jetty:jetty", "/run.sh");
+                builder.user("jetty");
             });
 
         try (GenericContainer<?> container = new GenericContainer<>(image)
