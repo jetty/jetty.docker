@@ -90,7 +90,7 @@ public class WelcomeFileTest
         return null;
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0}")
     @MethodSource("getImageTags")
     public void testJettyDockerImage(String imageTag) throws Exception
     {

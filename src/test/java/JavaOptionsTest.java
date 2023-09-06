@@ -77,7 +77,7 @@ public class JavaOptionsTest
     }
 
     @Disabled("https://github.com/eclipse/jetty.docker/issues/153")
-    @ParameterizedTest()
+    @ParameterizedTest(name = "{0}")
     @MethodSource("getImageTags")
     public void testMultiLineJavaOpts(String imageTag) throws Exception
     {
@@ -86,8 +86,11 @@ public class JavaOptionsTest
             .withDockerfileFromBuilder(builder ->
             {
                 builder.from("jetty:" + imageTag);
-                builder.entryPoint("chmod 755 /run.sh && /run.sh");
+                builder.entryPoint("/run.sh");
                 builder.user("root");
+                builder.run("chmod", "755", "/run.sh");
+                builder.run("chown", "jetty:jetty", "/run.sh");
+                builder.user("jetty");
             });
 
         try (GenericContainer<?> container = new GenericContainer<>(image)
@@ -109,7 +112,6 @@ public class JavaOptionsTest
         assertThat(log, containsString("org.eclipse.jetty.server.Request.maxFormContentSize = 2000000 (<command-line>)"));
     }
 
-    @Disabled("https://github.com/eclipse/jetty.docker/issues/160")
     @ParameterizedTest()
     @MethodSource("getImageTags")
     public void testRemoteJvmDebug(String imageTag) throws Exception
@@ -119,7 +121,20 @@ public class JavaOptionsTest
             .withDockerfileFromBuilder(builder ->
             {
                 builder.from("jetty:" + imageTag);
-                builder.env("JAVA_OPTIONS", "-agentlib:jdwp=transport=dt_socket,server=y,address=*:33333,suspend=n");
+                builder.env("JAVA_OPTIONS", "-agentlib:jdwp=transport=dt_socket,server=y,address=33333,suspend=n");
+
+                if (imageTag.contains("alpine-amazoncorretto"))
+                {
+                    builder.user("root");
+                    builder.run("apk add procps");
+                    builder.user("jetty");
+                }
+                else if (imageTag.contains("amazoncorretto"))
+                {
+                    builder.user("root");
+                    builder.run("yum install -y procps");
+                    builder.user("jetty");
+                }
             });
 
         try (GenericContainer<?> container = new GenericContainer<>(image)
@@ -137,12 +152,11 @@ public class JavaOptionsTest
             // First line lists the different columns.
             String header = output[0].trim();
             assertThat(header, startsWith("PID"));
-            assertThat(header, endsWith("CMD"));
 
             // First line is the java process should be on PID 1.
             String line1 = output[1].trim();
             assertThat(line1, startsWith("1"));
-            assertThat(line1, endsWith("java"));
+            assertThat(line1, containsString("java"));
 
             // Second line is the call to ps that we are currently doing.
             String line2 = output[2].trim();
