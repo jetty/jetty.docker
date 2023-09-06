@@ -118,7 +118,20 @@ public class JavaOptionsTest
             .withDockerfileFromBuilder(builder ->
             {
                 builder.from("jetty:" + imageTag);
-                builder.env("JAVA_OPTIONS", "-agentlib:jdwp=transport=dt_socket,server=y,address=*:33333,suspend=n");
+                builder.env("JAVA_OPTIONS", "-agentlib:jdwp=transport=dt_socket,server=y,address=33333,suspend=n");
+
+                if (imageTag.contains("alpine-amazoncorretto"))
+                {
+                    builder.user("root");
+                    builder.run("apk add procps");
+                    builder.user("jetty");
+                }
+                else if (imageTag.contains("amazoncorretto"))
+                {
+                    builder.user("root");
+                    builder.run("yum install -y procps");
+                    builder.user("jetty");
+                }
             });
 
         try (GenericContainer<?> container = new GenericContainer<>(image)
