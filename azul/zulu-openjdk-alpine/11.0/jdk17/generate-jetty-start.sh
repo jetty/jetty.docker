@@ -5,6 +5,11 @@ if [ -z "$JETTY_START" ] ; then
 fi
 rm -f $JETTY_START
 
+echo "whoami: $(whoami)"
+echo "jetty.start: $JETTY_START"
+echo "pwd: $(pwd)"
+ls -la $JETTY_BASE
+
 DRY_RUN=$(/docker-entrypoint.sh "$@" --dry-run)
 DRY_RUN=$(echo "$DRY_RUN" \
 	| egrep '[^ ]*java .*org\.eclipse\.jetty\.xml\.XmlConfiguration ' \
