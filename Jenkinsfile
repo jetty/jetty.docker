@@ -34,7 +34,7 @@ pipeline {
  */
 def mavenBuild(jdk, cmdline) {
   def mvnName = 'maven3'
-  def localRepo = "${env.JENKINS_HOME}/${env.EXECUTOR_NUMBER}" // ".repository" //
+  def localRepo = ".repository" //
   def settingsName = 'oss-settings.xml'
   def mavenOpts = '-Xms2g -Xmx2g -Djava.awt.headless=true'
 
