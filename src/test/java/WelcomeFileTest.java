@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -103,7 +104,8 @@ public class WelcomeFileTest
         try (GenericContainer<?> container = new GenericContainer<>("jetty:" + imageTag)
             .withExposedPorts(8080)
             .withClasspathResourceMapping("test-webapp", bindDir, BindMode.READ_ONLY)
-            .withCommand("sh", "-c", commandPrefix + "/docker-entrypoint.sh"))
+            .withCommand("sh", "-c", commandPrefix + "/docker-entrypoint.sh")
+            .waitingFor(Wait.forListeningPorts(8080)))
         {
             // Start the docker container and the server.
             container.start();

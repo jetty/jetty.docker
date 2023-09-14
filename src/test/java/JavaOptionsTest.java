@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import util.ImageUtil;
@@ -66,10 +67,13 @@ public class JavaOptionsTest
 
         try (GenericContainer<?> container = new GenericContainer<>("jetty:" + imageTag)
             .withCommand("-DtestProp=foo   bar", "--list-config")
-            .withLogConsumer(logConsumer))
+            .withLogConsumer(logConsumer)
+            .withExposedPorts(8080)
+            .waitingFor(Wait.forListeningPorts(8080)))
         {
             container.start();
-            logConsumer.await(5, TimeUnit.SECONDS);
+            // temporary hack because of docker on container on docker on kubernetes on containerd maybe another on docker...
+            container.execInContainer("chmod", "-R", "jetty:jetty", "/var/lib/jetty/", "/usr/local/jetty", "/tmp/jetty");
         }
 
         String logString = logConsumer.getLogString();
@@ -95,10 +99,14 @@ public class JavaOptionsTest
 
         try (GenericContainer<?> container = new GenericContainer<>(image)
             .withClasspathResourceMapping("multi-line-test/run.sh", "/run.sh", BindMode.READ_ONLY)
-            .withLogConsumer(logConsumer))
+            .withLogConsumer(logConsumer)
+            .withExposedPorts(8080)
+            .waitingFor(Wait.forListeningPorts(8080)))
         {
             container.start();
-            logConsumer.await(5, TimeUnit.SECONDS);
+            // temporary hack because of docker on container on docker on kubernetes on containerd maybe another on docker...
+            container.execInContainer("chmod", "-R", "jetty:jetty", "/var/lib/jetty/", "/usr/local/jetty", "/tmp/jetty");
+            //logConsumer.await(5, TimeUnit.SECONDS);
         }
 
         String log = logConsumer.getLogString();
