@@ -99,14 +99,16 @@ public class WelcomeFileTest
             commandPrefix = "java -jar $JETTY_HOME/start.jar --add-to-start=core-deploy ; ";
 
         // Start a jetty docker image with this imageTag, binding the directory of a simple webapp.
-        //String bindDir = "/var/lib/jetty/webapps/test-webapp";
+        String bindDir = "/var/lib/jetty/webapps/test-webapp";
         try (GenericContainer<?> container = new GenericContainer<>("jetty:" + imageTag)
             .withExposedPorts(8080)
-            //.withClasspathResourceMapping("test-webapp", bindDir, BindMode.READ_ONLY)
+            .withClasspathResourceMapping("test-webapp", bindDir, BindMode.READ_ONLY)
             .withCommand("sh", "-c", commandPrefix + "/docker-entrypoint.sh"))
         {
             // Start the docker container and the server.
             container.start();
+            // temporary hack because of docker on container on docker on kubernetes on containerd maybe another on docker...
+            container.execInContainer("chmod", "-R", "jetty:jetty", "/var/lib/jetty/", "/usr/local/jetty", "/tmp/jetty");
 
             // We should be able to get a 200 response from the test-webapp on the running jetty server.
             String uri = "http://" + container.getHost() + ":" + container.getMappedPort(8080) + "/test-webapp/index.html";
