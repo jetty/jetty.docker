@@ -74,7 +74,13 @@ RUN set -xe ; \
 	rm -rf /tmp/hsperfdata_root ; \
 	#
 	# Basic smoke test
-	java -jar "$JETTY_HOME/start.jar" --list-config ;
+	java -jar "$JETTY_HOME/start.jar" --list-config ; \
+	#
+	echo "initial JETTY_BASE:" ; \
+	ls -la "$JETTY_BASE" ; \
+	chown -R jetty:jetty "$JETTY_BASE" ; \
+	echo "second JETTY_BASE:" ; \
+	ls -la "$JETTY_BASE" ;
 
 WORKDIR $JETTY_BASE
 COPY docker-entrypoint.sh generate-jetty-start.sh /
@@ -83,3 +89,6 @@ USER jetty
 EXPOSE 8080
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["java","-jar","/usr/local/jetty/start.jar"]
+RUN set -xe ; \
+	echo "third JETTY_BASE:" ; \
+	ls -la "$JETTY_BASE" ;

@@ -90,10 +90,10 @@ RUN set -xe ; \
 	java -jar "$JETTY_HOME/start.jar" --list-config ; \
 	#
 	echo "initial JETTY_BASE:" ; \
-    ls -la "$JETTY_BASE" ; \
-    chown -R jetty:jetty "$JETTY_BASE" ; \
-    echo "second JETTY_BASE:" ; \
-    ls -la "$JETTY_BASE" ;
+	ls -la "$JETTY_BASE" ; \
+	chown -R jetty:jetty "$JETTY_BASE" ; \
+	echo "second JETTY_BASE:" ; \
+	ls -la "$JETTY_BASE" ;
 
 WORKDIR $JETTY_BASE
 COPY docker-entrypoint.sh generate-jetty-start.sh /
