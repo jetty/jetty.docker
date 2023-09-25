@@ -93,6 +93,8 @@ for path in "${paths[@]}"; do
 		variant=""
 	fi
 
+ echo $variant
+
 	fullVersion=$(getFullVersion $jettyVersion)
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "Unable to find Jetty package for $path"
