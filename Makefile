@@ -6,7 +6,7 @@ build: $(VERSIONS)
 
 define jetty-version
 $1:
-	docker build -t jetty:$(shell echo $1 | sed -e 's/\(.*\)\/\([^/]\+\)\/\([^/]\+\)/\2-\3-\1/g' | sed -e 's/\//-/g') $1
+	docker build --no-cache -t jetty:$(shell echo $1 | sed -e 's/\(.*\)\/\([^/]\+\)\/\([^/]\+\)/\2-\3-\1/g' | sed -e 's/\//-/g') $1
 endef
 $(foreach version,$(VERSIONS),$(eval $(call jetty-version,$(version))))
 
