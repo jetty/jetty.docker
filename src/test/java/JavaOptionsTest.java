@@ -6,6 +6,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -58,7 +59,8 @@ public class JavaOptionsTest
             httpClient.stop();
     }
 
-    @ParameterizedTest(name = "{0}")
+    @DisplayName("testSystemPropertyWithSpaces")
+    @ParameterizedTest(name = "{displayName}: {0}")
     @MethodSource("getImageTags")
     public void testSystemPropertyWithSpaces(String imageTag) throws Exception
     {
@@ -77,7 +79,8 @@ public class JavaOptionsTest
     }
 
     @Disabled("https://github.com/eclipse/jetty.docker/issues/153")
-    @ParameterizedTest(name = "{0}")
+    @DisplayName("testMultiLineJavaOpts")
+    @ParameterizedTest(name = "{displayName}: {0}")
     @MethodSource("getImageTags")
     public void testMultiLineJavaOpts(String imageTag) throws Exception
     {
@@ -112,7 +115,8 @@ public class JavaOptionsTest
         assertThat(log, containsString("org.eclipse.jetty.server.Request.maxFormContentSize = 2000000 (<command-line>)"));
     }
 
-    @ParameterizedTest()
+    @DisplayName("testRemoteJvmDebug")
+    @ParameterizedTest(name = "{displayName}: {0}")
     @MethodSource("getImageTags")
     public void testRemoteJvmDebug(String imageTag) throws Exception
     {

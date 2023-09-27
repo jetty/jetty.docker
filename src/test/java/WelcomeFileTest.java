@@ -12,6 +12,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.util.StringUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -90,7 +91,8 @@ public class WelcomeFileTest
         return null;
     }
 
-    @ParameterizedTest(name = "{0}")
+    @DisplayName("testJettyDockerImage")
+    @ParameterizedTest(name = "{displayName}: {0}")
     @MethodSource("getImageTags")
     public void testJettyDockerImage(String imageTag) throws Exception
     {
