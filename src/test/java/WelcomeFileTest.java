@@ -1,26 +1,20 @@
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpStatus;
-import org.eclipse.jetty.util.StringUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import util.ImageUtil;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -30,8 +24,6 @@ import static org.hamcrest.Matchers.is;
 @SuppressWarnings("resource")
 public class WelcomeFileTest
 {
-    private static final Logger LOG = LoggerFactory.getLogger(WelcomeFileTest.class);
-    private static final String USER_DIR = System.getProperty("user.dir");
     private static List<String> imageTags;
     private static HttpClient httpClient;
 
@@ -43,32 +35,7 @@ public class WelcomeFileTest
     @BeforeAll
     public static void beforeAll() throws Exception
     {
-        LOG.info("Running tests with user directory: {}", USER_DIR);
-
-        // Assemble a list of all the jetty image tags we need to test.
-        Path userDir = Paths.get(USER_DIR);
-        imageTags = Files.walk(userDir, 5)
-            .filter(path -> path.endsWith("Dockerfile"))
-            .filter(path ->
-            {
-                String baseImage = getBaseImage(path);
-                String version = path.getParent().getParent().getFileName().toString();
-                String tag = path.getParent().getFileName().toString();
-                return !StringUtil.isEmpty(baseImage)
-                    && !StringUtil.isEmpty(version)
-                    && !StringUtil.isEmpty(tag)
-                    && Character.isDigit(version.charAt(0));
-            })
-            .map(path ->
-            {
-                String baseImage = getBaseImage(path);
-                String version = path.getParent().getParent().getFileName().toString();
-                String tag = path.getParent().getFileName().toString();
-                return version + "-" + tag + "-" + baseImage;
-            })
-            .collect(Collectors.toList());
-        LOG.info("{} jetty.docker image tags: {}", imageTags.size(), imageTags);
-
+        imageTags = ImageUtil.getImageList();
         httpClient = new HttpClient();
         httpClient.start();
     }
@@ -78,17 +45,6 @@ public class WelcomeFileTest
     {
         if (httpClient != null)
             httpClient.stop();
-    }
-
-    private static String getBaseImage(Path path)
-    {
-        Path userDir = Paths.get(USER_DIR);
-        if (userDir.equals(path.getParent().getParent().getParent().getParent()))
-            return path.getParent().getParent().getParent().getFileName().toString();
-        else if (userDir.equals(path.getParent().getParent().getParent().getParent().getParent()))
-            return path.getParent().getParent().getParent().getParent().getFileName().toString()
-                + "-" + path.getParent().getParent().getParent().getFileName().toString();
-        return null;
     }
 
     @DisplayName("testJettyDockerImage")
