@@ -1,0 +1,1 @@
+FROM azul/zulu-openjdk:21
