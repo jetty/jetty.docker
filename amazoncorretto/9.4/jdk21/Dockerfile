@@ -1,7 +1,7 @@
-# DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
-FROM eclipse-temurin:17-jdk
+# DO NOT EDIT. Edit baseDockerfile-amazoncorretto and use update.sh
+FROM amazoncorretto:21
 
-ENV JETTY_VERSION 12.0.3
+ENV JETTY_VERSION 9.4.53.v20231009
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
@@ -28,19 +28,11 @@ ENV JETTY_GPG_KEYS \
 	E22488CC94F63E3FC928536C4241C08270D999C3
 
 RUN set -xe ; \
-	# Save initial installation state
-	export savedAptMark="$(apt-mark showmanual)" ; \
 	#
 	mkdir -p $TMPDIR ; \
 	#
-	# Install utils needed to verify keys
-	apt-get update ; \
-	apt-get install -y --no-install-recommends \
-		ca-certificates \
-		p11-kit \
-		gnupg \
-		curl \
-		; \
+	# Install utilities needed for setup.
+    yum install -y shadow-utils tar xz gzip && yum clean all ; \
 	#
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
@@ -74,12 +66,6 @@ RUN set -xe ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
 	usermod -d $JETTY_BASE jetty ; \
-	#
-	# Cleanup any apt
-	apt-mark auto '.*' > /dev/null ; \
-	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null ; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false ; \
-	rm -rf /var/lib/apt/lists/* ; \
 	#
 	# Cleanup
 	rm -rf /tmp/hsperfdata_root ; \
