@@ -68,6 +68,7 @@ RUN set -xe ; \
 	# Cleanup
 	rm -rf /tmp/hsperfdata_root ; \
 	rm -fr $JETTY_HOME/jetty.tar.gz* ; \
+	gpgconf --kill all ; \
 	rm -fr /jetty-keys $GNUPGHOME ; \
 	rm -rf /tmp/hsperfdata_root ; \
 	#
