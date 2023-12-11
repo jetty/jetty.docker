@@ -38,7 +38,7 @@ RUN set -xe ; \
 	apt-get install -y --no-install-recommends \
 		ca-certificates \
 		p11-kit \
-		gnupg \
+		gnupg2 \
 		curl \
 		; \
 	#
@@ -74,6 +74,7 @@ RUN set -xe ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
 	usermod -d $JETTY_BASE jetty ; \
+	gpgconf --kill all ; \
 	#
 	# Cleanup any apt
 	apt-mark auto '.*' > /dev/null ; \
@@ -84,7 +85,6 @@ RUN set -xe ; \
 	# Cleanup
 	rm -rf /tmp/hsperfdata_root ; \
 	rm -fr $JETTY_HOME/jetty.tar.gz* ; \
-	gpgconf --kill all ; \
 	rm -fr /jetty-keys $GNUPGHOME ; \
 	rm -rf /tmp/hsperfdata_root ; \
 	#

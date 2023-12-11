@@ -31,7 +31,7 @@ RUN set -xe ; \
 	mkdir -p $TMPDIR ; \
 	#
 	# Install utils needed to verify keys
-	apk add --no-cache gnupg curl ; \
+	apk add --no-cache gnupg2 curl ; \
 	#
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
