@@ -19,8 +19,9 @@ Jetty 12 can run with various different EE Environments.
 - Jetty Core Environment with no Servlet support or overhead.
 
 In the docker images prior to Jetty 12, certain Jetty Modules were enabled by default (server,http,deploy,ext,resources,jsp,jstl,websocket). 
+
 However, in the Jetty 12 images we do not assume which environment will be used, therefore we only add the following modules (server,http,ext,resources).
-If you are migrating to use the Jetty 12 docker images you will need to enable the Jetty modules that you require.
+If you are migrating to use the Jetty 12 docker images you will need to enable any additional Jetty modules that you require.
 
 For example, to use EE10 you could include the following line in your Dockerfile:
 ```Dockerfile
