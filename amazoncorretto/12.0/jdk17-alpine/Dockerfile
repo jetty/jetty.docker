@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile-alpine and use update.sh
 FROM amazoncorretto:17-alpine
 
-ENV JETTY_VERSION 12.0.11
+ENV JETTY_VERSION 12.0.12
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
