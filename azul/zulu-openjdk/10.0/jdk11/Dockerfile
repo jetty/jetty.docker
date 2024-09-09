@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
 FROM azul/zulu-openjdk:11
 
-ENV JETTY_VERSION 10.0.23
+ENV JETTY_VERSION 10.0.22
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
