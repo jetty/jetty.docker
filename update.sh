@@ -1,7 +1,6 @@
 #!/bin/bash
 
-greaterThanOrEqualTo9.4 ()
-{
+greaterThanOrEqualTo9.4() {
 	# If jettyVersion is not numerical it cannot be compared properly.
 	if [[ ! $1 =~ ^[0-9]+\.?[0-9]*$ ]]; then
 		echo "Invalid jettyVersion $1"
@@ -16,8 +15,7 @@ greaterThanOrEqualTo9.4 ()
 	fi
 }
 
-getFullVersion()
-{
+getFullVersion() {
 	jettyVersion=$1
 	milestones=()
 	releaseCandidates=()
@@ -57,18 +55,18 @@ getFullVersion()
 }
 
 # Update the docker files and scripts for every directory in paths.
-paths=( "$@" )
+paths=("$@")
 if [ ${#paths[@]} -eq 0 ]; then
-	paths=( $(find -mindepth 4 -maxdepth 5 -name "Dockerfile" | sed -e 's/\.\///' | sed -e 's/\/Dockerfile//' | sort -nr) )
+	paths=($(find -mindepth 4 -maxdepth 5 -name "Dockerfile" | sed -e 's/\.\///' | sed -e 's/\/Dockerfile//' | sort -nr))
 fi
-paths=( "${paths[@]%/}" )
+paths=("${paths[@]%/}")
 
 REPOSITORY_URL="${REPOSITORY_URL:=https://repo1.maven.org/maven2/org/eclipse/jetty}"
 JETTY_HOME_URL="$REPOSITORY_URL/jetty-home/\$JETTY_VERSION/jetty-home-\$JETTY_VERSION.tar.gz"
 JETTY_DISTRO_URL="$REPOSITORY_URL/jetty-distribution/\$JETTY_VERSION/jetty-distribution-\$JETTY_VERSION.tar.gz"
 MAVEN_METADATA_URL="$REPOSITORY_URL/jetty-server/maven-metadata.xml"
 
-available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
+available=($(curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr))
 
 for path in "${paths[@]}"; do
 	imageTag="${path##*/}"
@@ -81,6 +79,8 @@ for path in "${paths[@]}"; do
 		variant="alpine"
 	elif [[ $imageTag == *"slim"* ]]; then
 		variant="slim"
+	elif [[ $imageTag == *"al2023"* ]]; then
+		variant="al2023"
 	elif [[ $baseImage == "eclipse-temurin" ]]; then
 		variant="slim"
 	elif [[ $baseImage == "amazoncorretto" ]]; then
