@@ -31,7 +31,7 @@ RUN set -xe ; \
 	mkdir -p $TMPDIR ; \
 	#
 	# Install utilities needed for setup.
-	dnf install -y shadow-utils tar xz gzip which && dnf swap -y gnupg2-minimal gnupg2-full && dnf clean all ; \
+	dnf swap -y gnupg2-minimal gnupg2-full && dnf install -y shadow-utils tar xz gzip which && dnf clean all ; \
 	#
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
