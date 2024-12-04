@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
 FROM eclipse-temurin:23-jdk
 
-ENV JETTY_VERSION 12.0.14
+ENV JETTY_VERSION 12.0.15
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
