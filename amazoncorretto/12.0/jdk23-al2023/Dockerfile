@@ -1,6 +1,7 @@
-FROM IMAGE:TAG
+# DO NOT EDIT. Edit baseDockerfile-amazoncorretto and use update.sh
+FROM amazoncorretto:23-al2023
 
-ENV JETTY_VERSION VERSION
+ENV JETTY_VERSION 12.0.14
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
