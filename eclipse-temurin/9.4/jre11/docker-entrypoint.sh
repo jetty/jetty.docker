@@ -42,8 +42,10 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 	# check if it is a terminating command
 	for A in "$@" ; do
 		case $A in
+			--add-module* |\
 			--add-to-start* |\
 			--create-files |\
+			--create-start-ini |\
 			--create-startd |\
 			--download |\
 			--dry-run |\
@@ -54,9 +56,11 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 			--list-classpath |\
 			--list-config |\
 			--list-modules* |\
+			--show-module* |\
 			--stop |\
 			--update-ini |\
 			--version |\
+			--write-module-graph* |\
 			-v )\
 			# It is a terminating command, so exec directly
 			JAVA="$1"
