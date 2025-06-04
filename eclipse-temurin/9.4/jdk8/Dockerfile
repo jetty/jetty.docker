@@ -1,5 +1,5 @@
 # DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
-FROM eclipse-temurin:8-jdk-focal
+FROM eclipse-temurin:8-jdk
 
 ENV JETTY_VERSION 9.4.57.v20241219
 ENV JETTY_HOME /usr/local/jetty
