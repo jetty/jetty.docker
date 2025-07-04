@@ -56,6 +56,7 @@ public class VersionUpdateTest
         Path src = Path.of("src/test/resources/old-jetty-base");
         Files.copy(src.resolve("jetty.start"), jettyBase.resolve("jetty.start"));
 
+        // The alpine image needs some additional config to allow to run with a 1000 UID.
         String startCommand = "java -jar $JETTY_HOME/start.jar --add-to-start=http && /docker-entrypoint.sh";
         if (alpine)
             startCommand = "addgroup -g 1000 -S hostuser && " +
@@ -65,7 +66,6 @@ public class VersionUpdateTest
                 "ls -la && " +
                 "/docker-entrypoint.sh" +
                 "\"";
-
 
         // Verify the jetty.start file is regenerated if there is a different jetty version.
         try (GenericContainer<?> container = new GenericContainer<>("jetty:" + imageTag)
