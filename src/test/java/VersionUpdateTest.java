@@ -53,11 +53,9 @@ public class VersionUpdateTest
     @MethodSource("getImageTags")
     public void testJettyDockerImage(String imageTag, @TempDir Path jettyBase)
     {
-
         UnixSystem uds = new UnixSystem();
         long uid = uds.getUid();
         long gid = uds.getGid();
-        System.err.println("== UID: " + uid + ", GID: " + gid);
 
         // The alpine image needs some additional config to allow to run with a different UID.
         String startCommand = "java -jar $JETTY_HOME/start.jar --add-to-start=http && ls -la && /docker-entrypoint.sh";
@@ -85,7 +83,6 @@ public class VersionUpdateTest
             String logs = container.getLogs();
             assertThat(logs, containsString("Jetty version mismatch (old-version -> "));
             assertThat(logs, containsString("regenerating jetty.start"));
-            System.err.println(logs);
         }
 
         // Verify the jetty.start file not modified since the jetty version is not updated.
@@ -102,7 +99,6 @@ public class VersionUpdateTest
             assertThat(logs, containsString("jetty start from /var/lib/jetty/jetty.start"));
             assertThat(logs, not(containsString("Jetty version mismatch (old-version -> ")));
             assertThat(logs, not(containsString("regenerating jetty.start")));
-            System.err.println(logs);
         }
     }
 }
