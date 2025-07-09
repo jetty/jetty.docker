@@ -1,4 +1,3 @@
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,8 +30,7 @@ public class VersionUpdateTest
 
     public static Stream<Arguments> getImageTags()
     {
-//        return imageTags.stream().map(Arguments::of);
-        return Stream.of(Arguments.of("12.0-jre21-eclipse-temurin"));
+        return imageTags.stream().map(Arguments::of);
     }
 
     @BeforeAll
@@ -99,10 +97,12 @@ public class VersionUpdateTest
         {
             container.start();
 
-            // The jetty.start file should be regenerated if there is a different jetty version.
+            // The jetty.start file should NOT be regenerated.
             String logs = container.getLogs();
+            assertThat(logs, containsString("jetty start from /var/lib/jetty/jetty.start"));
             assertThat(logs, not(containsString("Jetty version mismatch (old-version -> ")));
             assertThat(logs, not(containsString("regenerating jetty.start")));
+            System.err.println(logs);
         }
     }
 }
