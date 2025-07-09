@@ -58,14 +58,13 @@ public class VersionUpdateTest
         long gid = uds.getGid();
 
         // The alpine image needs some additional config to allow to run with a different UID.
-        String startCommand = "java -jar $JETTY_HOME/start.jar --add-to-start=http && ls -la && /docker-entrypoint.sh";
+        String startCommand = "java -jar $JETTY_HOME/start.jar --add-to-start=http && /docker-entrypoint.sh";
         boolean alpine = imageTag.contains("alpine");
         if (alpine && uid != 0 && gid != 0)
             startCommand = "addgroup -g " + gid + " -S hostuser && " +
                 "adduser  -u " + uid + " -S -G hostuser hostuser && " +
                 "exec su -s /bin/sh hostuser -c \"" +
                 "java -jar $JETTY_HOME/start.jar --add-to-start=http && " +
-                "ls -la && " +
                 "/docker-entrypoint.sh" +
                 "\"";
 
