@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.MountableFile;
 import util.ImageUtil;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,11 +53,8 @@ public class VersionUpdateTest
     @DisplayName("testJettyDockerImage")
     @ParameterizedTest(name = "{displayName}: {0}")
     @MethodSource("getImageTags")
-    public void testJettyDockerImage(String imageTag, @TempDir Path jettyBase) throws Exception
+    public void testJettyDockerImage(String imageTag, @TempDir Path jettyBase)
     {
-        boolean alpine = imageTag.contains("alpine");
-        Path src = Path.of("src/test/resources/old-jetty-base");
-        Files.copy(src.resolve("jetty.start"), jettyBase.resolve("jetty.start"));
 
         UnixSystem uds = new UnixSystem();
         long uid = uds.getUid();
@@ -65,6 +63,7 @@ public class VersionUpdateTest
 
         // The alpine image needs some additional config to allow to run with a different UID.
         String startCommand = "java -jar $JETTY_HOME/start.jar --add-to-start=http && ls -la && /docker-entrypoint.sh";
+        boolean alpine = imageTag.contains("alpine");
         if (alpine)
             startCommand = "addgroup -g " + gid + " -S hostuser && " +
                 "adduser  -u " + uid + " -S -G hostuser hostuser && " +
@@ -75,10 +74,12 @@ public class VersionUpdateTest
                 "\"";
 
         // Verify the jetty.start file is regenerated if there is a different jetty version.
+        MountableFile jettyStart = MountableFile.forClasspathResource("old-jetty-base/jetty.start");
         try (GenericContainer<?> container = new GenericContainer<>("jetty:" + imageTag)
             .withExposedPorts(8080)
             .withCreateContainerCmdModifier(cmd -> cmd.withUser(alpine ? "0:0" : uid + ":" + gid))
             .withFileSystemBind(jettyBase.toString(), "/var/lib/jetty", BindMode.READ_WRITE)
+            .withCopyFileToContainer(jettyStart, "/var/lib/jetty/jetty.start")
             .withCommand("sh", "-c", startCommand))
         {
             container.start();
