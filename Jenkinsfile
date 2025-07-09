@@ -8,11 +8,11 @@ pipeline {
     timeout(time: 240, unit: 'MINUTES')
   }
   stages {
-    stage( "Build / Test - JDK11" ) {
+    stage( "Build / Test - JDK21" ) {
       agent { node { label 'linux' } }
       options { timeout( time: 240, unit: 'MINUTES' ) }
       steps {
-        mavenBuild( "jdk11", "clean verify" )
+        mavenBuild( "jdk21", "clean verify" )
         script {
           if ( env.BRANCH_NAME == 'master' )
           {
