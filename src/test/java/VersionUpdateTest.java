@@ -61,9 +61,10 @@ public class VersionUpdateTest
         UnixSystem uds = new UnixSystem();
         long uid = uds.getUid();
         long gid = uds.getGid();
+        System.err.println("== UID: " + uid + ", GID: " + gid);
 
         // The alpine image needs some additional config to allow to run with a different UID.
-        String startCommand = "java -jar $JETTY_HOME/start.jar --add-to-start=http && /docker-entrypoint.sh";
+        String startCommand = "java -jar $JETTY_HOME/start.jar --add-to-start=http && ls -la && /docker-entrypoint.sh";
         if (alpine)
             startCommand = "addgroup -g " + gid + " -S hostuser && " +
                 "adduser  -u " + uid + " -S -G hostuser hostuser && " +
@@ -85,6 +86,7 @@ public class VersionUpdateTest
             String logs = container.getLogs();
             assertThat(logs, containsString("Jetty version mismatch (old-version -> "));
             assertThat(logs, containsString("regenerating jetty.start"));
+            System.err.println(logs);
         }
 
         // Verify the jetty.start file not modified since the jetty version is not updated.
