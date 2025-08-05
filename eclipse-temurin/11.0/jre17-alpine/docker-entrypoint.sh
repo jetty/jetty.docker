@@ -81,7 +81,20 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 	fi
 
 	if [ -f $JETTY_START ] ; then
-		if [ $JETTY_BASE/start.d -nt $JETTY_START ] ; then
+
+		# Search for the Jetty Version comment in the jetty.start file.
+		JETTY_START_VERSION="$(
+			grep -m1 '^# JETTY_VERSION:' "$JETTY_START" 2>/dev/null \
+				| sed 's/^# JETTY_VERSION: //'
+		)"
+
+		# If the jetty.start file was generated with a different Jetty version we need to regenerate jetty.start.
+		if [ -n "$JETTY_START_VERSION" ] && [ "$JETTY_START_VERSION" != "$JETTY_VERSION" ]; then
+			echo "$(date +'%Y-%m-%d %H:%M:%S'):INFO: Jetty version mismatch ($JETTY_START_VERSION -> $JETTY_VERSION), regenerating jetty.start" >&2
+			/generate-jetty-start.sh "$@"
+
+		# If the start.d directory has been modified we need to regenerate jetty.start.
+		elif [ $JETTY_BASE/start.d -nt $JETTY_START ] ; then
 			cat >&2 <<- EOWARN
 			********************************************************************
 			WARNING: The $JETTY_BASE/start.d directory has been modified since
