@@ -1,12 +1,12 @@
 # DO NOT EDIT. Edit baseDockerfile-amazoncorretto and use update.sh
 FROM amazoncorretto:17
 
-ENV JETTY_VERSION 12.1.0.alpha0
+ENV JETTY_VERSION 12.1.0.beta2
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
 ENV PATH $JETTY_HOME/bin:$PATH
-ENV JETTY_TGZ_URL https://oss.sonatype.org/content/groups/jetty-with-staging/org/eclipse/jetty/jetty-home/$JETTY_VERSION/jetty-home-$JETTY_VERSION.tar.gz
+ENV JETTY_TGZ_URL https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/$JETTY_VERSION/jetty-home-$JETTY_VERSION.tar.gz
 
 # GPG Keys are personal keys of Jetty committers (see https://github.com/eclipse/jetty.project/blob/0607c0e66e44b9c12a62b85551da3a0edce0281e/KEYS.txt)
 ENV JETTY_GPG_KEYS \
@@ -32,7 +32,8 @@ RUN set -xe ; \
 	mkdir -p $TMPDIR ; \
 	#
 	# Install utilities needed for setup.
-    yum install -y shadow-utils tar xz gzip which && yum clean all ; \
+	yum install -y shadow-utils tar xz gzip which && yum clean all ; \
+	command -v dnf && dnf swap -y gnupg2-minimal gnupg2-full && dnf clean all ; \
 	#
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
