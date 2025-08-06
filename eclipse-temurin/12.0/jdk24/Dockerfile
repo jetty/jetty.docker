@@ -1,7 +1,7 @@
-# DO NOT EDIT. Edit baseDockerfile-alpine and use update.sh
-FROM eclipse-temurin:23-jdk-alpine
+# DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
+FROM eclipse-temurin:24-jdk
 
-ENV JETTY_VERSION 12.0.14
+ENV JETTY_VERSION 12.0.23
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
@@ -28,10 +28,19 @@ ENV JETTY_GPG_KEYS \
 	E22488CC94F63E3FC928536C4241C08270D999C3
 
 RUN set -xe ; \
+	# Save initial installation state
+	export savedAptMark="$(apt-mark showmanual)" ; \
+	#
 	mkdir -p $TMPDIR ; \
 	#
 	# Install utils needed to verify keys
-	apk add --no-cache gnupg curl ; \
+	apt-get update ; \
+	apt-get install -y --no-install-recommends \
+		ca-certificates \
+		p11-kit \
+		gnupg2 \
+		curl \
+		; \
 	#
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
@@ -62,13 +71,20 @@ RUN set -xe ; \
 	esac ; \
 	java -jar "$JETTY_HOME/start.jar" --create-startd \
 		--add-to-start="$START_MODULES" ; \
-	addgroup -S jetty && adduser -h $JETTY_BASE -S jetty -G jetty; \
+	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
+	usermod -d $JETTY_BASE jetty ; \
+	gpgconf --kill all ; \
+	#
+	# Cleanup any apt
+	apt-mark auto '.*' > /dev/null ; \
+	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null ; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false ; \
+	rm -rf /var/lib/apt/lists/* ; \
 	#
 	# Cleanup
 	rm -rf /tmp/hsperfdata_root ; \
 	rm -fr $JETTY_HOME/jetty.tar.gz* ; \
-	gpgconf --kill all ; \
 	rm -fr /jetty-keys $GNUPGHOME ; \
 	rm -rf /tmp/hsperfdata_root ; \
 	#

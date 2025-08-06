@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile-amazoncorretto and use update.sh
 FROM amazoncorretto:8
 
-ENV JETTY_VERSION 9.4.56.v20240826
+ENV JETTY_VERSION 9.4.57.v20241219
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
@@ -32,7 +32,8 @@ RUN set -xe ; \
 	mkdir -p $TMPDIR ; \
 	#
 	# Install utilities needed for setup.
-    yum install -y shadow-utils tar xz gzip which && yum clean all ; \
+	yum install -y shadow-utils tar xz gzip which && yum clean all ; \
+	command -v dnf && dnf swap -y gnupg2-minimal gnupg2-full && dnf clean all ; \
 	#
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \

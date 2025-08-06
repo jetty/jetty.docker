@@ -1,0 +1,2 @@
+# JETTY_VERSION: old-version
+echo "test failed"
