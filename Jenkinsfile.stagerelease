@@ -12,7 +12,7 @@ pipeline {
         name: 'JETTY_VERSION' )
     string( defaultValue: 'jdk21', description: 'JDK to use (jdk8,jdk11,jdk17, jdk21)', name: 'JDK' )
     string( defaultValue: 'master', description: 'jetty.docker branch', name: 'JETTY_DOCKER_BRANCH' )
-    string( defaultValue: 'http://nexus-service.nexus.svc.cluster.local:8081/repository/release-staging', description: 'staging url', name: 'STAGING_URL' )
+    string( defaultValue: 'http://nexus-service.nexus.svc.cluster.local:8081/repository/maven-public/', description: 'staging url', name: 'STAGING_URL' )
   }
   stages {
     stage("Checkout jetty.docker"){
@@ -31,6 +31,10 @@ pipeline {
                    "MAVEN_OPTS=-Xms6g -Xmx8g -Djava.awt.headless=true"]) {
             configFileProvider(
                 [configFile(fileId: 'oss-settings.xml', variable: 'GLOBAL_MVN_SETTINGS')]) {
+              sh '''
+                export REPOSITORY_URL="${STAGING_URL}"
+                ./update.sh
+              '''
               sh "mvn -s $GLOBAL_MVN_SETTINGS -V -B -U clean install -Dmaven.test.failure.ignore=true -fae -Djetty.version=${JETTY_VERSION}"
             }
           }
