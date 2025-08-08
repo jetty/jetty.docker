@@ -1,0 +1,50 @@
+#!groovy
+
+pipeline {
+  agent none
+  options {
+    durabilityHint('PERFORMANCE_OPTIMIZED')
+    buildDiscarder(logRotator(numToKeepStr: '7', artifactNumToKeepStr: '2'))
+    timeout(time: 240, unit: 'MINUTES')
+  }
+  parameters {
+    string( defaultValue: '12.0.24', description: 'Jetty version to use to build jetty.docker project',
+        name: 'JETTY_VERSION' )
+    string( defaultValue: 'jdk21', description: 'JDK to use (jdk8,jdk11,jdk17, jdk21)', name: 'JDK' )
+    string( defaultValue: 'master', description: 'jetty.docker branch', name: 'JETTY_DOCKER_BRANCH' )
+    string( defaultValue: '', description: 'staging url', name: 'STAGING_URL' )
+  }
+  stages {
+    stage("Checkout jetty.docker"){
+      steps{
+        checkout([$class: 'GitSCM',
+                  branches: [[name: "*/$JETTY_DOCKER_BRANCH"]],
+                  extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
+                  userRemoteConfigs: [[url: 'https://github.com/jetty/jetty.docker.git']]])
+      }
+    }
+    stage("Build jetty.docker"){
+      steps{
+        timeout( time: 240, unit: 'MINUTES' ) {
+          withEnv(["JAVA_HOME=${ tool "$jdk" }",
+                   "PATH+MAVEN=${ tool "$jdk" }/bin:${tool "maven3"}/bin",
+                   "MAVEN_OPTS=-Xms6g -Xmx8g -Djava.awt.headless=true"]) {
+            configFileProvider(
+                [configFile(fileId: 'oss-settings.xml', variable: 'GLOBAL_MVN_SETTINGS')]) {
+              sh "mvn -s $GLOBAL_MVN_SETTINGS -V -B -U clean install -Dmaven.test.failure.ignore=true -fae -Djetty.version=${JETTY_VERSION}"
+            }
+          }
+        }
+      }
+      post {
+        always {
+          script{
+            currentBuild.description = "Build Cometd branch ${COMETD_BRANCH}, Jetty Version ${JETTY_VERSION}, jdk ${jdk}"
+          }
+          junit testResults: '**/target/surefire-reports/*.xml'
+        }
+      }
+    }
+  }
+}
+// vim: et:ts=2:sw=2:ft=groovy
