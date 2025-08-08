@@ -1,4 +1,5 @@
 #!/bin/bash
 
-export REPOSITORY_URL="https://oss.sonatype.org/content/groups/jetty-with-staging/org/eclipse/jetty"
+export AVAILABLE_JETTY_VERSIONS="$*"
+export REPOSITORY_URL="http://localhost:8081/repository/maven-public/org/eclipse/jetty"
 ./update.sh
