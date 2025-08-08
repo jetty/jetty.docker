@@ -1,3 +1,4 @@
+set -x
 #!/bin/bash
 
 greaterThanOrEqualTo9.4 ()
