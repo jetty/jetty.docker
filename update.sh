@@ -24,7 +24,7 @@ getFullVersion()
 	alphaReleases=()
 	betaReleases=()
 	fullReleases=()
-	for candidate in "${available[@]}"; do
+	for candidate in "${AVAILABLE_JETTY_VERSIONS[@]}"; do
 		if [[ "$candidate" == "$jettyVersion".* ]]; then
 			if [[ "$candidate" == *.M* ]]; then
 				milestones+=("$candidate")
@@ -62,13 +62,18 @@ if [ ${#paths[@]} -eq 0 ]; then
 	paths=( $(find -mindepth 4 -maxdepth 5 -name "Dockerfile" | sed -e 's/\.\///' | sed -e 's/\/Dockerfile//' | sort -nr) )
 fi
 paths=( "${paths[@]%/}" )
-
 REPOSITORY_URL="${REPOSITORY_URL:=https://repo1.maven.org/maven2/org/eclipse/jetty}"
 JETTY_HOME_URL="$REPOSITORY_URL/jetty-home/\$JETTY_VERSION/jetty-home-\$JETTY_VERSION.tar.gz"
 JETTY_DISTRO_URL="$REPOSITORY_URL/jetty-distribution/\$JETTY_VERSION/jetty-distribution-\$JETTY_VERSION.tar.gz"
 MAVEN_METADATA_URL="$REPOSITORY_URL/jetty-server/maven-metadata.xml"
 
-available=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
+if [ -z "$AVAILABLE_JETTY_VERSIONS" ]; then
+	AVAILABLE_JETTY_VERSIONS=( $( curl -sSL "$MAVEN_METADATA_URL" | grep -Eo '<(version)>[^<]*</\1>' | awk -F'[<>]' '{ print $3 }' | sort -Vr ) )
+	echo "Available Jetty versions (metadata): ${AVAILABLE_JETTY_VERSIONS[@]}"
+else
+	IFS=' ' read -r -a AVAILABLE_JETTY_VERSIONS <<< "$AVAILABLE_JETTY_VERSIONS"
+	echo "Available Jetty versions (provided): ${AVAILABLE_JETTY_VERSIONS[@]}"
+fi
 
 for path in "${paths[@]}"; do
 	imageTag="${path##*/}"
@@ -96,7 +101,7 @@ for path in "${paths[@]}"; do
 	fullVersion=$(getFullVersion $jettyVersion)
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "Unable to find Jetty package for $path"
-		exit 1
+		continue
 	fi
 
 	echo "Update $path - $fullVersion - $variant"
