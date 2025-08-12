@@ -89,7 +89,7 @@ if expr "$*" : 'java .*/start\.jar.*$' >/dev/null ; then
 		)"
 
 		# If the jetty.start file was generated with a different Jetty version we need to regenerate jetty.start.
-		if [ -n "$JETTY_START_VERSION" ] && [ "$JETTY_START_VERSION" != "$JETTY_VERSION" ]; then
+		if [ "$JETTY_START_VERSION" != "$JETTY_VERSION" ]; then
 			echo "$(date +'%Y-%m-%d %H:%M:%S'):INFO: Jetty version mismatch ($JETTY_START_VERSION -> $JETTY_VERSION), regenerating jetty.start" >&2
 			/generate-jetty-start.sh "$@"
 
