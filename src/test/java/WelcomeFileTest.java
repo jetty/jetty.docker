@@ -53,8 +53,10 @@ public class WelcomeFileTest
     public void testJettyDockerImage(String imageTag) throws Exception
     {
         String commandPrefix = "";
-        if (imageTag.contains("12."))
+        if (imageTag.contains("12.0"))
             commandPrefix = "java -jar $JETTY_HOME/start.jar --add-to-start=core-deploy ; ";
+        else if (imageTag.contains("12.1"))
+            commandPrefix = "java -jar $JETTY_HOME/start.jar --add-to-start=static-deploy ; ";
 
         // Start a jetty docker image with this imageTag, binding the directory of a simple webapp.
         String bindDir = "/var/lib/jetty/webapps/test-webapp";
