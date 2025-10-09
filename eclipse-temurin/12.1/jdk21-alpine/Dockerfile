@@ -1,7 +1,7 @@
 # DO NOT EDIT. Edit baseDockerfile-alpine and use update.sh
 FROM eclipse-temurin:21-jdk-alpine
 
-ENV JETTY_VERSION 12.1.1
+ENV JETTY_VERSION 12.1.2
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
