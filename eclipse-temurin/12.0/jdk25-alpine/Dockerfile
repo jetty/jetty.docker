@@ -1,5 +1,5 @@
-# DO NOT EDIT. Edit baseDockerfile-amazoncorretto and use update.sh
-FROM amazoncorretto:24-al2023
+# DO NOT EDIT. Edit baseDockerfile-alpine and use update.sh
+FROM eclipse-temurin:25-jdk-alpine
 
 ENV JETTY_VERSION 12.0.28
 ENV JETTY_HOME /usr/local/jetty
@@ -28,12 +28,10 @@ ENV JETTY_GPG_KEYS \
 	E22488CC94F63E3FC928536C4241C08270D999C3
 
 RUN set -xe ; \
-	#
 	mkdir -p $TMPDIR ; \
 	#
-	# Install utilities needed for setup.
-	yum install -y shadow-utils tar xz gzip which && yum clean all ; \
-	command -v dnf && dnf swap -y gnupg2-minimal gnupg2-full && dnf clean all ; \
+	# Install utils needed to verify keys
+	apk add --no-cache gnupg curl ; \
 	#
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
@@ -64,13 +62,13 @@ RUN set -xe ; \
 	esac ; \
 	java -jar "$JETTY_HOME/start.jar" --create-startd \
 		--add-to-start="$START_MODULES" ; \
-	groupadd -r jetty && useradd -r -g jetty jetty ; \
+	addgroup -S jetty && adduser -h $JETTY_BASE -S jetty -G jetty; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
-	usermod -d $JETTY_BASE jetty ; \
 	#
 	# Cleanup
 	rm -rf /tmp/hsperfdata_root ; \
 	rm -fr $JETTY_HOME/jetty.tar.gz* ; \
+	gpgconf --kill all ; \
 	rm -fr /jetty-keys $GNUPGHOME ; \
 	rm -rf /tmp/hsperfdata_root ; \
 	#
