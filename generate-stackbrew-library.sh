@@ -2,7 +2,7 @@
 set -ueo pipefail
 shopt -s globstar
 
-defaultJdk="jdk21"
+defaultJdk="jdk25"
 defaultVersions=("12.1" "11.0" "10.0" "9.4")
 defaultImage="eclipse-temurin"
 excludedBases=("azul")
@@ -19,7 +19,8 @@ isDefaultVersion() {
 
 declare -A aliases
 aliases=(
-	[eclipse-temurin-12.1-jdk21]='latest jdk21'
+	[eclipse-temurin-12.1-jdk25]='latest jdk25'
+	[eclipse-temurin-12.1-jdk21]='jdk21'
 	[eclipse-temurin-12.1-jdk17]='jdk17'
 )
 
