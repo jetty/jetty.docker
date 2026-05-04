@@ -5,6 +5,8 @@ updates:
     target-branch: "master"
     schedule:
       interval: "daily"
+    allow:
+      - dependency-type: "all"
   - package-ecosystem: "docker"
     directory: "/"
     target-branch: "master"
