@@ -22,6 +22,7 @@ aliases=(
 	[eclipse-temurin-12.1-jdk25]='latest jdk25'
 	[eclipse-temurin-12.1-jdk21]='jdk21'
 	[eclipse-temurin-12.1-jdk17]='jdk17'
+	[amazoncorretto-12.0-jdk25-al2023]='12.0-amazoncorretto 12.0-jdk25-amazoncorretto'
 )
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
