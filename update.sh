@@ -115,7 +115,7 @@ for path in "${paths[@]}"; do
 		# Only generate docker file for jettyVersions past 9.4, otherwise just update existing Dockerfile.
 		if greaterThanOrEqualTo9.4 "${jettyVersion}"; then
 			# Maintain the existing base image tag.
-			prevTag=$(cat "$path"/Dockerfile | egrep "FROM $baseImage" | sed "s|.*FROM $baseImage:\([^ ]\+\)|\1|")
+			prevTag=$(cat "$path"/Dockerfile | grep -e "FROM $baseImage" | sed "s|.*FROM $baseImage:\([^ ]\+\)|\1|")
 
 			# Generate the Dockerfile in the directory for this jettyVersion.
 			echo "# DO NOT EDIT. Edit baseDockerfile${variant:+-$variant} and use update.sh" >"$path"/Dockerfile

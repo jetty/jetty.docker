@@ -8,7 +8,7 @@ paths=( "${paths[@]%/}" )
 
 declare -A versionToPaths
 for path in "${paths[@]}"; do
-	version=$(cat "$path"/Dockerfile | egrep "ENV JETTY_VERSION" | sed "s|.*ENV JETTY_VERSION \(.*\)|\1|")
+	version=$(cat "$path"/Dockerfile | grep -e "ENV JETTY_VERSION" | sed "s|.*ENV JETTY_VERSION \(.*\)|\1|")
 	versionToPaths["$version"]+=" $path"
 done
 
