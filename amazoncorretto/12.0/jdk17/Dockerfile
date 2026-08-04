@@ -32,7 +32,7 @@ ENV JETTY_GPG_KEYS \
 	75DE085F73C1223260663C245663FB7A8FF7E348
 
 RUN set -xe ; \
-	#
+	# \
 	mkdir -p $TMPDIR ; \
 	#
 	# Install utilities needed for setup.
@@ -45,20 +45,22 @@ RUN set -xe ; \
 	for key in $JETTY_GPG_KEYS; do \
 		gpg --batch --keyserver "hkps://keyserver.ubuntu.com" --recv-keys "$key"; \
 	done ; \
-	#
+	# \
 	# Fetch jetty release into JETTY_HOME
 	mkdir -p "$JETTY_HOME" ; \
 	cd $JETTY_HOME ; \
 	curl -SL "$JETTY_TGZ_URL" -o jetty.tar.gz ; \
 	curl -SL "$JETTY_TGZ_URL.asc" -o jetty.tar.gz.asc ; \
 	#
+	gpg --version ; \
+	cat /etc/os-release; \
 	# Verify GPG signatures
 	gpg --batch --verify jetty.tar.gz.asc jetty.tar.gz ; \
 	#
 	# Unpack jetty
 	tar -xvf jetty.tar.gz --strip-components=1 ; \
 	sed -i '/jetty-logging/d' etc/jetty.conf ; \
-	#
+	# \
 	# Create and configure the JETTY_HOME directory
 	mkdir -p "$JETTY_BASE" ; \
 	cd $JETTY_BASE ; \
@@ -71,7 +73,7 @@ RUN set -xe ; \
 	groupadd -r jetty && useradd -r -g jetty jetty ; \
 	chown -R jetty:jetty "$JETTY_HOME" "$JETTY_BASE" "$TMPDIR" ; \
 	usermod -d $JETTY_BASE jetty ; \
-	#
+	# \
 	# Cleanup
 	rm -rf /tmp/hsperfdata_root ; \
 	rm -fr $JETTY_HOME/jetty.tar.gz* ; \

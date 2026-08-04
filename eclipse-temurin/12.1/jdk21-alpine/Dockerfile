@@ -37,6 +37,9 @@ RUN set -xe ; \
 	# Install utils needed to verify keys
 	apk add --no-cache gnupg curl ; \
 	#
+	#
+	gpg --version ; \
+    cat /etc/os-release; \
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
 	mkdir -p "$GNUPGHOME" ; \
