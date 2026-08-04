@@ -30,8 +30,7 @@ paths=( $(find -mindepth 4 -maxdepth 5 -name "Dockerfile" | sed -e 's/\.\///' | 
 url='https://github.com/eclipse/jetty.docker.git'
 
 cat <<-EOH
-	Maintainers: Greg Wilkins <gregw@webtide.com> (@gregw),
-	             Lachlan Roberts <lachlan@webtide.com> (@lachlan-roberts),
+	Maintainers: Lachlan Roberts <lachlan@webtide.com> (@lachlan-roberts),
 	             Olivier Lamy <olamy@webtide.com> (@olamy),
 	             Joakim Erdfelt <joakim@webtide.com> (@joakime)
 	GitRepo: $url
