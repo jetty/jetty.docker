@@ -39,6 +39,9 @@ RUN set -xe ; \
 	yum install -y shadow-utils tar xz gzip which && yum clean all ; \
 	command -v dnf && dnf swap -y gnupg2-minimal gnupg2-full && dnf clean all ; \
 	#
+	#
+	gpg --version ; \
+	cat /etc/os-release; \
 	# fetch GPG keys
 	export GNUPGHOME=/jetty-keys ; \
 	mkdir -p "$GNUPGHOME" ; \
@@ -51,9 +54,6 @@ RUN set -xe ; \
 	cd $JETTY_HOME ; \
 	curl -SL "$JETTY_TGZ_URL" -o jetty.tar.gz ; \
 	curl -SL "$JETTY_TGZ_URL.asc" -o jetty.tar.gz.asc ; \
-	#
-	gpg --version ; \
-	cat /etc/os-release; \
 	# Verify GPG signatures
 	gpg --batch --verify jetty.tar.gz.asc jetty.tar.gz ; \
 	#
