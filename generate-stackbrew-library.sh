@@ -22,7 +22,13 @@ aliases=(
 	[eclipse-temurin-12.1-jdk25]='latest jdk25'
 	[eclipse-temurin-12.1-jdk21]='jdk21'
 	[eclipse-temurin-12.1-jdk17]='jdk17'
-	[amazoncorretto-12.0-jdk25-al2023]='12.0-amazoncorretto 12.0-jdk25-amazoncorretto'
+	# Migration of AL2023 tags since AL2 is now EOL.
+	[amazoncorretto-12.0-jdk25]='12.0-jdk25-al2023-amazoncorretto'
+	[amazoncorretto-12.0-jdk21]='12.0-jdk21-al2023-amazoncorretto'
+	[amazoncorretto-12.0-jdk17]='12.0-jdk17-al2023-amazoncorretto'
+	[amazoncorretto-12.1-jdk25]='12-jdk25-al2023-amazoncorretto 12.1-jdk25-al2023-amazoncorretto'
+	[amazoncorretto-12.1-jdk21]='12-jdk21-al2023-amazoncorretto 12.1-jdk21-al2023-amazoncorretto'
+	[amazoncorretto-12.1-jdk17]='12-jdk17-al2023-amazoncorretto 12.1-jdk17-al2023-amazoncorretto'
 )
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
