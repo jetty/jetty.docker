@@ -1,14 +1,14 @@
 # DO NOT EDIT. Edit baseDockerfile-amazoncorretto and use update.sh
 FROM amazoncorretto:25
 
-ENV JETTY_VERSION 12.0.37
+ENV JETTY_VERSION 12.0.38
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
 ENV PATH $JETTY_HOME/bin:$PATH
 ENV JETTY_TGZ_URL https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/$JETTY_VERSION/jetty-home-$JETTY_VERSION.tar.gz
 
-# GPG Keys are personal keys of Jetty committers (see https://github.com/eclipse/jetty.project/blob/0607c0e66e44b9c12a62b85551da3a0edce0281e/KEYS.txt)
+# GPG Keys are personal keys of Jetty committers (see https://github.com/jetty/jetty.project/blob/jetty-12.1.x/KEYS.txt)
 ENV JETTY_GPG_KEYS \
 	# Jan Bartel      <janb@mortbay.com>
 	AED5EE6C45D0FE8D5D1B164F27DED4BF6216DB8F \
@@ -24,8 +24,12 @@ ENV JETTY_GPG_KEYS \
 	8B096546B1A8F02656B15D3B1677D141BCF3584D \
 	# Olivier Lamy    <olamy@apache.org>
 	F254B35617DC255D9344BCFA873A8E86B4372146 \
+	# Olivier Lamy    <olamy@apache.org>
+	716EE302674CDBB2E660E1B44DB5EA09F2E3C800 \
 	# Ludovic Orban   <lorban@bitronix.be>
-	E22488CC94F63E3FC928536C4241C08270D999C3
+	CD38A1DADA3413BE96DF547F3D146A4A1C58367E \
+	# Lachlan Roberts <lachlan.p.roberts@gmail.com>
+	75DE085F73C1223260663C245663FB7A8FF7E348
 
 RUN set -xe ; \
 	#
