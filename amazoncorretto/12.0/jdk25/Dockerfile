@@ -1,5 +1,5 @@
 # DO NOT EDIT. Edit baseDockerfile-amazoncorretto and use update.sh
-FROM amazoncorretto:25
+FROM amazoncorretto:25-al2023
 
 ENV JETTY_VERSION 12.0.38
 ENV JETTY_HOME /usr/local/jetty

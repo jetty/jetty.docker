@@ -22,13 +22,6 @@ aliases=(
 	[eclipse-temurin-12.1-jdk25]='latest jdk25'
 	[eclipse-temurin-12.1-jdk21]='jdk21'
 	[eclipse-temurin-12.1-jdk17]='jdk17'
-	# Migration of AL2023 tags since AL2 is now EOL.
-	[amazoncorretto-12.0-jdk25]='12.0-jdk25-al2023-amazoncorretto'
-	[amazoncorretto-12.0-jdk21]='12.0-jdk21-al2023-amazoncorretto'
-	[amazoncorretto-12.0-jdk17]='12.0-jdk17-al2023-amazoncorretto'
-	[amazoncorretto-12.1-jdk25]='12-jdk25-al2023-amazoncorretto 12.1-jdk25-al2023-amazoncorretto'
-	[amazoncorretto-12.1-jdk21]='12-jdk21-al2023-amazoncorretto 12.1-jdk21-al2023-amazoncorretto'
-	[amazoncorretto-12.1-jdk17]='12-jdk17-al2023-amazoncorretto 12.1-jdk17-al2023-amazoncorretto'
 )
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -78,6 +71,13 @@ for path in "${paths[@]}"; do
 	# We can't add a / in a tag so we must replace it.
 	baseImage="$(echo $baseImage | sed -r 's/\//-/g')"
 
+	# If the parent image is AL2023 based, also emit -al2023- tag variants so
+	# that users can pin to that distribution explicitly.
+	al2023Suffix=""
+	if grep -qE '^FROM .*-al2023([[:space:]]|$)' "$directory/Dockerfile"; then
+		al2023Suffix="al2023-"
+	fi
+
 	# Collect the potential fullVersion aliases
 	declare -a versionAliases
 	versionAliases=()
@@ -119,6 +119,9 @@ for path in "${paths[@]}"; do
 		for va in "${versionAliases[@]}"; do
 			if [[ "$va" == *.* ]] || isDefaultVersion "$fullVersion"; then
 				addTag "$va-$baseImage"
+				if [ -n "$al2023Suffix" ]; then
+					addTag "$va-$al2023Suffix$baseImage"
+				fi
 			fi
 		done
 	fi
@@ -128,6 +131,9 @@ for path in "${paths[@]}"; do
 	for va in "${versionAliases[@]}"; do
 		if [[ "$va" == *.* ]] || isDefaultVersion "$fullVersion"; then
 			addTag "$va-$imageTag-$baseImage"
+			if [ -n "$al2023Suffix" ]; then
+				addTag "$va-$imageTag-$al2023Suffix$baseImage"
+			fi
 		fi
 	done
 
