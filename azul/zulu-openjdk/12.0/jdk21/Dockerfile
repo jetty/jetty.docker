@@ -1,12 +1,12 @@
 # DO NOT EDIT. Edit baseDockerfile-slim and use update.sh
 FROM azul/zulu-openjdk:21
 
-ENV JETTY_VERSION 12.0.40
+ENV JETTY_VERSION 12.0.41
 ENV JETTY_HOME /usr/local/jetty
 ENV JETTY_BASE /var/lib/jetty
 ENV TMPDIR /tmp/jetty
 ENV PATH $JETTY_HOME/bin:$PATH
-ENV JETTY_TGZ_URL https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/$JETTY_VERSION/jetty-home-$JETTY_VERSION.tar.gz
+ENV JETTY_TGZ_URL http://10.0.0.15:8081/repository/maven-public/org/eclipse/jetty/jetty-home/$JETTY_VERSION/jetty-home-$JETTY_VERSION.tar.gz
 
 # GPG Keys are personal keys of Jetty committers (see https://github.com/jetty/jetty.project/blob/jetty-12.1.x/KEYS.txt)
 ENV JETTY_GPG_KEYS \
