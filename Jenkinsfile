@@ -9,7 +9,7 @@ pipeline {
   }
   stages {
     stage( "Build / Test - JDK21" ) {
-      agent { node { label 'linux' } }
+      agent { node { label 'linux-old' } }
       options { timeout( time: 240, unit: 'MINUTES' ) }
       steps {
         mavenBuild( "jdk21", "clean verify" )
